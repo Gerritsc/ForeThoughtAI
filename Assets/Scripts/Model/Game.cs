@@ -1,0 +1,142 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+public enum HANDTYPE { STRAIGHT, FULLHOUSE, FLUSH, FOURKIND }
+/// <summary>
+/// Represents a single game of Forethought
+/// </summary>
+public class Game : IGame
+{
+    public IDeck deck;
+    public IBoard board { get; set; }
+
+    /// <summary>
+    /// represents whose turn it is, 0 being player1, 1 being player2
+    /// </summary>
+    int playerturn;
+
+    public Game()
+    {
+        deck = new PlayingCardDeck();
+        deck.ShuffleDeck();
+        playerturn = 0;
+
+        var startingcards = new ICard[5];
+        for (int i = 0; i < 5; i++)
+        {
+            startingcards[i] = deck.DrawCard();
+        }
+        board = new GameBoard(startingcards);
+    }
+
+
+    public IGame RestartGame()
+    {
+        return new Game();
+    }
+
+    public void switchTurn()
+    {
+        //Switch to player2's turn
+        if (playerturn == 0)
+        {
+            playerturn = 1;
+        }
+        //switch to player1's turn
+        else
+        {
+            playerturn = 0;
+        }
+    }
+
+    public void SwapCards(int player, int x1, int y1, int x2, int y2)
+    {
+        try
+        {
+            board.swapCards(x1, y1, x2, y2);
+            switchTurn();
+        }
+        catch (Exception e)
+        {
+            Console.Write(e.Message);
+        }
+    }
+
+    public void PlayCard(int player, int x, int y, ICard card)
+    {
+        try
+        {
+            this.board.addCard(x, y, card);
+            switchTurn();
+        }
+        catch(Exception e)
+        {
+
+        }
+    }
+
+    public IBoard getBoard()
+    {
+        return this.board;
+    }
+
+    public bool CheckGameOverClaim(List<ICard> cardset, HANDTYPE wintype)
+    {
+        if (cardset.Count != 5)
+        {
+            return false;
+            Console.WriteLine("This is not a valid hand");
+        }
+
+
+        switch (wintype)
+        {
+            case HANDTYPE.STRAIGHT:
+                {
+                    sortbyValue(cardset);
+                    int[] values = (from i in cardset select i.GetCardNumValue()).ToArray() ;
+
+                    //manual check for A2345 straight
+                    if (cardset.Last().GetCardNumValue() == 14 && cardset.First().GetCardNumValue() == 2)
+                    {
+                        return (values[1] == 2 && values[2] == 3 && values[3] == 4 && values[4] == 5);
+                    }
+                    break;
+                }
+            case HANDTYPE.FLUSH:
+                {
+                    string suit = cardset.First().getSuitorColor();
+                    foreach(ICard i in cardset)
+                    {
+                        if (i.getSuitorColor() != suit)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            case HANDTYPE.FULLHOUSE:
+                {
+                    sortbyValue(cardset);
+
+                    int[] values = (from i in cardset select i.GetCardNumValue()).ToArray();
+                    return (values[0] == values[1] && values[3] == values[4] && (values[2] == values[1] || values[2] == values[3]));
+
+                        break;
+                }
+            case HANDTYPE.FOURKIND:
+                {
+                    break;
+                }
+
+        }
+        return false;
+    }
+
+    public List<ICard> sortbyValue(List<ICard> cards)
+    {
+        return cards.OrderBy(o => o.GetCardNumValue()).ToList();
+    }
+}
