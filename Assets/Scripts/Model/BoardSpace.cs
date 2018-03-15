@@ -57,4 +57,14 @@ public class BoardSpace
             throw new ArgumentException("You are trying to swap cards on an empty space.");
         }
     }
+
+    public void removeCard()
+    {
+        if (this.card != null)
+        {
+            //deinstance the card to this boardspace
+            this.card = null;
+        }
+        else throw new ArgumentException("No card here");
+    }
 }

@@ -52,4 +52,15 @@ public interface IGame
     /// </summary>
     /// <param name="cards"></param>
     List<ICard> sortbyValue(List<ICard> cards);
+
+
+    /// <summary>
+    /// Removes a card at the given location, if the given player has not already removed a card this game.
+    /// Cards in the corners or center can NOT be removed, and this will return an error.
+    /// the removed card is not added back into the deck
+    /// </summary>
+    /// <param name="player">player who's turn it is</param>
+    /// <param name="x">x coordinate on the board</param>
+    /// <param name="y">y coordinate on the board</param>
+    void RemoveCard(int player, int x, int y);
 }

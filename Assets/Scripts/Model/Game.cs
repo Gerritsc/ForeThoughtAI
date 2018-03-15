@@ -12,6 +12,9 @@ public class Game : IGame
     public IDeck deck;
     public IBoard board { get; set; }
 
+    //Map keeping track of player's ability to remove from the board, holds true if they can remove
+    public Dictionary<int, bool> removalmap;
+
     /// <summary>
     /// represents whose turn it is, 0 being player1, 1 being player2
     /// </summary>
@@ -22,6 +25,9 @@ public class Game : IGame
         deck = new PlayingCardDeck();
         deck.ShuffleDeck();
         playerturn = 0;
+        removalmap = new Dictionary<int, bool>();
+        removalmap.Add(0, true);
+        removalmap.Add(1, true);
 
         var startingcards = new ICard[5];
         for (int i = 0; i < 5; i++)
@@ -87,7 +93,7 @@ public class Game : IGame
         if (cardset.Count != 5)
         {
             return false;
-            Console.WriteLine("This is not a valid hand");
+            Console.WriteLine("This is not a valid hand to win with");
         }
 
 
@@ -138,5 +144,28 @@ public class Game : IGame
     public List<ICard> sortbyValue(List<ICard> cards)
     {
         return cards.OrderBy(o => o.GetCardNumValue()).ToList();
+    }
+
+    public void RemoveCard(int player, int x, int y)
+    {
+        var maxlen = board.GetBoardDimensions() - 1;
+        //Check if the given coordinates are the board corners
+        if((x == 0  && y == 0)  || 
+           (x == 0 && y == maxlen)  ||
+           (x == maxlen && y == 0)  ||
+           (x == maxlen & y == maxlen)  ||
+           (x == (maxlen/2) && y == (maxlen/2)))
+        {
+            throw new ArgumentException("You cannot remove a corner card");
+        }
+
+        try
+        {
+            board.removeCard(x, y);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+        }
     }
 }

@@ -117,4 +117,22 @@ class GameBoard : IBoard
         var space = board[x, y];
         return space.getCard();
     }
+
+    public int GetBoardDimensions()
+    {
+        return GRIDSIZE;
+    }
+
+    public void removeCard(int x, int y)
+    {
+        var space = board[x, y];
+
+        try
+        {
+            space.removeCard();
+        }
+        catch(Exception e) {
+            throw e;
+        }
+    }
 }

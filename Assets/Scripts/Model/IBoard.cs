@@ -38,5 +38,17 @@ public interface IBoard
     /// <param name="y2">y coordinate of second space</param>
     void swapCards(int x1, int y1, int x2, int y2);
 
+    /// <summary>
+    /// Removes the card at this space, throws an error if no card is at that space.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    void removeCard(int x, int y);
+
     void PrintBoard();
+    /// <summary>
+    /// Returns the dimensions of this game board.  because these boards are square, only one value is needed
+    /// </summary>
+    /// <returns></returns>
+    int GetBoardDimensions();
 }
