@@ -63,4 +63,10 @@ public interface IGame
     /// <param name="x">x coordinate on the board</param>
     /// <param name="y">y coordinate on the board</param>
     void RemoveCard(int player, int x, int y);
+
+    /// <summary>
+    /// Gets this game's deck
+    /// </summary>
+    /// <returns></returns>
+    IDeck getDeck();
 }

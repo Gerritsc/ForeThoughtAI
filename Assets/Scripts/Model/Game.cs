@@ -168,4 +168,9 @@ public class Game : IGame
             Console.WriteLine(e.ToString());
         }
     }
+
+    public IDeck getDeck()
+    {
+        return this.deck;
+    }
 }
