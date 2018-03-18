@@ -61,11 +61,16 @@ public class BoardRenderer : MonoBehaviour {
                 var col = obj.AddComponent<BoxCollider>();
                 col.size = new Vector3(1, 1f, .6f);
                 col.isTrigger = true;
+                obj.tag = "BoardSpace";
+                var bstruct = obj.AddComponent<BoardSpaceStruct>();
+                bstruct.x = x;
+                bstruct.y = y;
 
 
                 var card = board.GetCardAtSpace(x, y);
                 if (card != null)
                 {
+                    obj.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
                     obj.GetComponent<SpriteRenderer>().sprite = cardtosprite.getSprite(card);
                 }
                 else
@@ -96,6 +101,7 @@ public class BoardRenderer : MonoBehaviour {
                 var card = board.GetCardAtSpace(x, y);
                 if (card != null)
                 {
+                    boardobjects[x,y].GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
                     if ((x + y) % 2 != 0)
                     {
                         boardobjects[x, y].GetComponent<SpriteRenderer>().sprite = cardtosprite.getFaceDown();
@@ -104,6 +110,11 @@ public class BoardRenderer : MonoBehaviour {
                     {
                         boardobjects[x, y].GetComponent<SpriteRenderer>().sprite = cardtosprite.getSprite(card);
                     }
+                }
+                else
+                {
+                    boardobjects[x, y].GetComponent<SpriteRenderer>().color = new Color(0, 0, 0);
+                    boardobjects[x,y].GetComponent<SpriteRenderer>().sprite = cardtosprite.getEmptySpace();
                 }
             }
         }
