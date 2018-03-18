@@ -130,7 +130,7 @@ public class Game : IGame
                     int[] values = (from i in cardset select i.GetCardNumValue()).ToArray();
                     return (values[0] == values[1] && values[3] == values[4] && (values[2] == values[1] || values[2] == values[3]));
 
-                        break;
+                    break;
                 }
             case HANDTYPE.FOURKIND:
                 {
