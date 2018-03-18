@@ -12,6 +12,11 @@ public class CardToSprite : MonoBehaviour {
         return cards[52];
     }
 
+    public Sprite getEmptySpace()
+    {
+        return cards[52];
+    }
+
     public Sprite getSprite(ICard card)
     {
         Debug.Log(card.getFullCard());
