@@ -64,7 +64,7 @@ class GameBoard : IBoard
 
     public void addCard(int x, int y, ICard card)
     {
-        if (x < GRIDSIZE - 1 && y < GRIDSIZE - 1)
+        if (x < GRIDSIZE && y < GRIDSIZE)
         {
             BoardSpace space = board[x, y];
             if (space.getCard() == null)
