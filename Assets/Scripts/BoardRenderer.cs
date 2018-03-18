@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using cakeslice;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -31,12 +32,12 @@ public class BoardRenderer : MonoBehaviour {
 
     private void OnEnable()
     {
-
+        FindObjectOfType<ModelManager>().OnBoardChange += UpdateBoard;
     }
 
     private void OnDisable()
     {
-        
+        FindObjectOfType<ModelManager>().OnBoardChange -= UpdateBoard;
     }
 
     // Use this for initialization
@@ -50,10 +51,12 @@ public class BoardRenderer : MonoBehaviour {
             for (int x = 0; x < ROWCOUNT; x++)
             {
                 var obj = new GameObject();
+                obj.gameObject.name = x.ToString() + ","+ y.ToString();
                 obj.transform.Rotate(new Vector3(90, 0, 0));
                 obj.transform.localScale = new Vector3(2, 2, 2);
                 obj.transform.position = new Vector3(startX + (x * X_OFFSET), cardHeight, startY + (y * Y_OFFSET));
                 obj.AddComponent<SpriteRenderer>();
+                obj.AddComponent<Outline>();
                 var card = board.GetCardAtSpace(x, y);
                 if (card != null)
                 {
@@ -64,11 +67,36 @@ public class BoardRenderer : MonoBehaviour {
 
         }
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    public void UpdateBoard(IGame model)
+    {
+        board = model.getBoard();
+        renderboard();
+        
+    }
+
+    private void renderboard()
+    {
+        var cardtosprite = FindObjectOfType<CardToSprite>();
+        for (int y = 0; y < ROWCOUNT; y++)
+        {
+            for (int x = 0; x < ROWCOUNT; x++)
+            {
+                var card = board.GetCardAtSpace(x, y);
+                if (card != null)
+                {
+                    if ((x + y) % 2 != 0)
+                    {
+                        boardobjects[x, y].GetComponent<SpriteRenderer>().sprite = cardtosprite.getFaceDown();
+                    }
+                    else
+                    {
+                        boardobjects[x, y].GetComponent<SpriteRenderer>().sprite = cardtosprite.getSprite(card);
+                    }
+                }
+            }
+        }
+    }
 
 
 }
