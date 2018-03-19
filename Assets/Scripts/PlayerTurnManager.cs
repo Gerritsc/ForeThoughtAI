@@ -28,7 +28,15 @@ public class PlayerTurnManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            swapflag = false;
+            SelectedSpace.setOutlineColor(0);
+            SelectedSpace = null;
+            FindObjectOfType<buttonManager>().Deselect();
+        }
+
+        else if (Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -56,7 +64,6 @@ public class PlayerTurnManager : MonoBehaviour {
                         manager.gameModel.PlayCard(0, space.x, space.y, SelectedCard);
                         manager.updateBoard();
                     }
-
                 }
             }
         }
@@ -65,6 +72,7 @@ public class PlayerTurnManager : MonoBehaviour {
     public void setSwapFlag()
     {
         swapflag = true;
+        
     }
 
     public void SelectFunctionality(BoardSpaceStruct space, ICard card)

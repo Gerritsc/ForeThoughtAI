@@ -23,9 +23,4 @@ public class ModelManager : MonoBehaviour {
     {
         OnBoardChange(gameModel);
     }
-
-    private void Update()
-    {
-        
-    }
 }

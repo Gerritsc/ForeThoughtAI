@@ -45,8 +45,6 @@ public class buttonManager : MonoBehaviour {
 
     public void onSelect(BoardSpaceStruct space, IGame model)
     {
-
-
         swapButton.SetActive(true);
 
         if (!space.isFaceup())
@@ -58,12 +56,28 @@ public class buttonManager : MonoBehaviour {
 
     }
 
-    public void onDeselect(BoardSpaceStruct space, IGame model)
+    public void Deselect()
     {
         swapButton.SetActive(false);
         peekButton.SetActive(false);
         removeButton.SetActive(false);
-
     }
 
+    public void onDeselect(BoardSpaceStruct space, IGame model)
+    {
+        Deselect();
+    }
+
+    //Not working ATM
+    public void SwapButtonSelected()
+    {
+        peekButton.SetActive(false);
+        removeButton.SetActive(false);
+        swapButton.GetComponent<Image>().color = new Color(242, 48,68);
+    }
+
+    public void swapButtonCancelled()
+    {
+        swapButton.GetComponent<Image>().color = new Color(255, 255, 255);
+    }
 }
