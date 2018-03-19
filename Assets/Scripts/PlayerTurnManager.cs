@@ -16,12 +16,14 @@ public class PlayerTurnManager : MonoBehaviour {
     public event SpaceSelectAction onSpaceSelect;
     public event SpaceSelectAction onSpaceDeselect;
 
+    bool swapflag;
+
 	// Use this for initialization
 	void Awake () {
         manager = FindObjectOfType<ModelManager>();
         SelectedSpace = null;
         SelectedCard = new PlayingCard("Hearts", 11);
-
+        swapflag = false;
     }
 	
 	// Update is called once per frame
@@ -36,9 +38,14 @@ public class PlayerTurnManager : MonoBehaviour {
                 {
                     var space = hit.transform.GetComponent<BoardSpaceStruct>();
                     var card = space.getCard();
-
+                    //Swap functionality
+                    if (swapflag && card != null && SelectedSpace != null)
+                    {
+                        //check for same space swap
+                        if (SelectedSpace.x == space.x && SelectedSpace.y == space.y) {return;}
+                    }
                     //Select/Deselect Space
-                    if ( card != null)
+                    else if (card != null)
                     {
                         SelectFunctionality(space, card);
                     }
@@ -53,6 +60,11 @@ public class PlayerTurnManager : MonoBehaviour {
                 }
             }
         }
+    }
+
+    public void setSwapFlag()
+    {
+        swapflag = true;
     }
 
     public void SelectFunctionality(BoardSpaceStruct space, ICard card)
