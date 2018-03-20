@@ -29,4 +29,16 @@ public class BoardSpaceStruct : MonoBehaviour {
     {
         return (x + y) % 2 == 0;
     }
+
+    //flips up this space's card (must be a face down card)
+    public void flipUp()
+    {
+        var card = getCard();
+        GetComponent<SpriteRenderer>().sprite = FindObjectOfType<CardToSprite>().getSprite(card);
+    }
+
+    public void flipBackDown()
+    {
+        GetComponent<SpriteRenderer>().sprite = FindObjectOfType<CardToSprite>().getFaceDown();
+    }
 }

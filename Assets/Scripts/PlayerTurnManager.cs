@@ -28,12 +28,11 @@ public class PlayerTurnManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+        //Deselect/Cancel all actions
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            swapflag = false;
-            SelectedSpace.setOutlineColor(0);
-            SelectedSpace = null;
-            FindObjectOfType<buttonManager>().Deselect();
+            CancelActions();
         }
 
         else if (Input.GetMouseButtonDown(0))
@@ -65,6 +64,11 @@ public class PlayerTurnManager : MonoBehaviour {
                         manager.updateBoard();
                     }
                 }
+                //Select/Deselect card in hand
+                else if (hit.transform.tag == "Hand")
+                {
+
+                }
             }
         }
     }
@@ -73,6 +77,22 @@ public class PlayerTurnManager : MonoBehaviour {
     {
         swapflag = true;
         
+    }
+
+    public void StartPeek()
+    {
+        StartCoroutine("peekFunctionality", 2f);
+    }
+
+    //flips a face down card, displaying its value
+    IEnumerator peekFunctionality(float time)
+    {
+        var spaceToPeek = SelectedSpace;
+        spaceToPeek.flipUp();
+        yield return new WaitForSeconds(time);
+
+        spaceToPeek.flipBackDown();
+
     }
 
     public void SelectFunctionality(BoardSpaceStruct space, ICard card)
@@ -98,5 +118,14 @@ public class PlayerTurnManager : MonoBehaviour {
             onSpaceSelect(SelectedSpace, manager.gameModel);
 
         }
+    }
+
+    public void CancelActions()
+    {
+        swapflag = false;
+        SelectedSpace.setOutlineColor(0);
+        SelectedSpace = null;
+        //SelectedCard = null;
+        FindObjectOfType<buttonManager>().Deselect();
     }
 }
