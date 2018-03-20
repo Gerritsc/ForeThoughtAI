@@ -22,12 +22,24 @@ public class HandRender : MonoBehaviour {
 
 	List<ICard> hand;
 
-	void Awake () {
+    private void OnEnable()
+    {
+        FindObjectOfType<ModelManager>().OnBoardChange += UpdateHand;
+        InitHand();
+    }
+
+    private void OnDisable()
+    {
+        FindObjectOfType<ModelManager>().OnBoardChange -= UpdateHand;
+    }
+
+    void InitHand () {
 		hand = FindObjectOfType<ModelManager> ().gameModel.getHand ();
+        cards = new GameObject[5];
 		var cardtosprite = FindObjectOfType<CardToSprite>();
-		var obj = new GameObject();
 		for (int i = 0; i < 5; i++) {
-			obj.gameObject.name = i.ToString();
+            var obj = new GameObject();
+            obj.gameObject.name = i.ToString();
 			obj.transform.Rotate(new Vector3(90, 0, 0));
 			obj.transform.localScale = new Vector3(2, 2, 2);
 			obj.transform.position = new Vector3(startX + (i * X_OFFSET), cardHeight, startY);
