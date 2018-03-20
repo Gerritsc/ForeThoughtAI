@@ -191,4 +191,9 @@ public class Game : IGame
     {
         return this.deck;
     }
+
+	public List<ICard> getHand() 
+	{
+		return this.player;
+	}
 }
