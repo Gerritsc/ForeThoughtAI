@@ -45,6 +45,7 @@ public class buttonManager : MonoBehaviour {
 
     public void onSelect(BoardSpaceStruct space, IGame model)
     {
+        peekButton.SetActive(false);
         swapButton.SetActive(true);
 
         if (!space.isFaceup())
