@@ -70,9 +70,17 @@ public interface IGame
     /// <returns></returns>
     IDeck getDeck();
 
+<<<<<<< HEAD
 	/// <summary>
 	/// Gets the hand.
 	/// </summary>
 	/// <returns>The hand.</returns>
 	List<ICard> getHand ();
+=======
+    /// <summary>
+	/// Gets the hand.
+	/// </summary>
+	/// <returns>The hand.</returns>
+	List<ICard> getHand();
+>>>>>>> 3c394d7964dd8044458c11a9ab5840c9f4745714
 }

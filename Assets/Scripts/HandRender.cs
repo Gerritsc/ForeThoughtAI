@@ -27,7 +27,7 @@ public class HandRender : MonoBehaviour {
 		var cardtosprite = FindObjectOfType<CardToSprite>();
 		var obj = new GameObject();
 		for (int i = 0; i < 5; i++) {
-			obj.gameObject.name = i.ToString ();
+			obj.gameObject.name = i.ToString();
 			obj.transform.Rotate(new Vector3(90, 0, 0));
 			obj.transform.localScale = new Vector3(2, 2, 2);
 			obj.transform.position = new Vector3(startX + (i * X_OFFSET), cardHeight, startY);
