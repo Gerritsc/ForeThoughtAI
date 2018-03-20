@@ -12,6 +12,8 @@ public class Game : IGame
     public IDeck deck;
     public IBoard board { get; set; }
 
+	public List<ICard> player, AI;
+
     //Map keeping track of player's ability to remove from the board, holds true if they can remove
     public Dictionary<int, bool> removalmap;
 
@@ -35,6 +37,14 @@ public class Game : IGame
             startingcards[i] = deck.DrawCard();
         }
         board = new GameBoard(startingcards);
+
+		player = new List<ICard> ();
+		AI = new List<ICard> ();
+		for (int i = 0; i < 5; i++) 
+		{
+			player.Add (deck.DrawCard());
+			AI.Add (deck.DrawCard());
+		}
     }
 
 
@@ -75,6 +85,14 @@ public class Game : IGame
         try
         {
             this.board.addCard(x, y, card);
+			if (player == 0) {
+				this.player.Remove(card);
+				this.player.Add(deck.DrawCard());
+			} else {
+				this.AI.Remove(card);
+				this.AI.Add(deck.DrawCard());
+			}
+			
             switchTurn();
         }
         catch(Exception e)
