@@ -39,7 +39,7 @@ public class HandRender : MonoBehaviour {
 		for (int i = 0; i < 5; i++) {
             var obj = new GameObject();
             obj.gameObject.name = i.ToString();
-			obj.transform.Rotate(new Vector3(90, 0, 0));
+			obj.transform.Rotate(new Vector3(60, 0, 0));
 			obj.transform.localScale = new Vector3(2, 2, 2);
 			obj.transform.position = new Vector3(startX + (i * X_OFFSET), cardHeight, startY);
             obj.transform.parent = this.gameObject.transform;
@@ -48,9 +48,14 @@ public class HandRender : MonoBehaviour {
 			var col = obj.AddComponent<BoxCollider>();
 			col.size = new Vector3(1, 1f, .6f);
 			col.isTrigger = true;
+            var hcs = obj.AddComponent<HandCardStruct>();
+            hcs.card = hand[i];
+            hcs.pos = i;
+
 
 			obj.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
 			obj.GetComponent<SpriteRenderer>().sprite = cardtosprite.getSprite (this.hand [i]);
+            obj.tag = "Hand";
 
 			cards [i] = obj;
 		}
@@ -59,7 +64,10 @@ public class HandRender : MonoBehaviour {
 	void UpdateHand(IGame model) {
 		hand = model.getHand ();
 		renderHand ();
-	}
+        for (int i = 0; i < 5; i++) {
+            cards[i].GetComponent<HandCardStruct>().card = model.getHand()[i];
+        }
+ 	}
 
 	void renderHand () {
 		var cardtosprite = FindObjectOfType<CardToSprite>();

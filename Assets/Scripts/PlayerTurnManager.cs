@@ -6,7 +6,7 @@ using UnityEngine;
 public class PlayerTurnManager : MonoBehaviour {
 
     [SerializeField]
-    ICard SelectedCard;
+    HandCardStruct SelectedCard;
 
     BoardSpaceStruct SelectedSpace;
 
@@ -22,7 +22,7 @@ public class PlayerTurnManager : MonoBehaviour {
 	void Awake () {
         manager = FindObjectOfType<ModelManager>();
         SelectedSpace = null;
-        SelectedCard = new PlayingCard("Hearts", 11);
+        SelectedCard = null;
         swapflag = false;
     }
 	
@@ -54,20 +54,24 @@ public class PlayerTurnManager : MonoBehaviour {
                     //Select/Deselect Space
                     else if (card != null)
                     {
-                        SelectFunctionality(space, card);
+                        SelectSpaceFunctionality(space, card);
                     }
 
                     //Play Card on space
                     else if (SelectedCard != null)
                     {
-                        manager.gameModel.PlayCard(0, space.x, space.y, SelectedCard);
+                        manager.gameModel.PlayCard(0, space.x, space.y, SelectedCard.card);
+                        SelectedCard.setOutlineColor(0);
+                        SelectedCard = null;
                         manager.updateBoard();
                     }
                 }
                 //Select/Deselect card in hand
                 else if (hit.transform.tag == "Hand")
                 {
-
+                    
+                    var cardspace = hit.transform.GetComponent<HandCardStruct>();
+                    SelectHandFunctionality(cardspace);
                 }
             }
         }
@@ -95,7 +99,30 @@ public class PlayerTurnManager : MonoBehaviour {
 
     }
 
-    public void SelectFunctionality(BoardSpaceStruct space, ICard card)
+    public void SelectHandFunctionality(HandCardStruct cardspace)
+    {
+        bool deselected = false;
+        cardspace.setOutlineColor(1);
+
+        if (SelectedCard != null)
+        {
+            SelectedCard.setOutlineColor(0);
+
+            if (SelectedCard.pos == cardspace.pos)
+            {
+                SelectedCard = null;
+                deselected = true;
+            }
+        }
+
+        if (!deselected)
+        {
+            SelectedCard = cardspace;
+            cardspace.setOutlineColor(1);
+        }
+    }
+
+    public void SelectSpaceFunctionality(BoardSpaceStruct space, ICard card)
     {
         bool deselected = false;
         if (SelectedSpace != null)
