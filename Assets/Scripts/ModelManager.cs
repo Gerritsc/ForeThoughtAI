@@ -12,6 +12,8 @@ public class ModelManager : MonoBehaviour {
     // Use this for initialization
     void Awake () {
         gameModel = new Game();
+        FindObjectOfType<HandRender>().InitHand();
+        FindObjectOfType<BoardRenderer>().initBoard();
 	}
 
     void RestartGame()
