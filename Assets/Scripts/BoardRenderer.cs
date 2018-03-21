@@ -56,6 +56,7 @@ public class BoardRenderer : MonoBehaviour {
                 obj.transform.Rotate(new Vector3(90, 0, 0));
                 obj.transform.localScale = new Vector3(2, 2, 2);
                 obj.transform.position = new Vector3(startX + (x * X_OFFSET), cardHeight, startY + (y * Y_OFFSET));
+                obj.transform.parent = background.transform;
                 obj.AddComponent<SpriteRenderer>();
                 obj.AddComponent<cakeslice.Outline>();
                 var col = obj.AddComponent<BoxCollider>();

@@ -74,7 +74,7 @@ public class Game : IGame
     {
         try
         {
-            this.board.addCard(x, y, card);
+             this.board.addCard(x, y, card);
             switchTurn();
         }
         catch(Exception e)
