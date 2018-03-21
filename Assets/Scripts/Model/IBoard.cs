@@ -51,4 +51,15 @@ public interface IBoard
     /// </summary>
     /// <returns></returns>
     int GetBoardDimensions();
+
+
+    /// <summary>
+    /// Returns whether or not these 2 positions are swappable
+    /// </summary>
+    /// <param name="x1">x pos of first space</param>
+    /// <param name="y1">y pos of first space</param>
+    /// <param name="x2">x pos of second space</param>
+    /// <param name="y2">y pos of second space</param>
+    /// <returns></returns>
+    bool canSwap(int x1, int y1, int x2, int y2);
 }

@@ -135,4 +135,24 @@ class GameBoard : IBoard
             throw e;
         }
     }
+
+    public bool canSwap(int x1, int y1, int x2, int y2)
+    {
+        var firstSpace = board[x1, y1];
+        var secondSpace = board[x2, y2];
+
+        if (firstSpace.getCard() == null)
+        {
+            return false;
+        }
+        if (secondSpace.getCard() == null)
+        {
+            return false;
+        }
+        if (firstSpace.isFaceUp() != secondSpace.isFaceUp())
+        {
+            return false;
+        }
+        return true;
+    }
 }
