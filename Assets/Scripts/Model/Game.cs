@@ -196,4 +196,9 @@ public class Game : IGame
     {
         return this.player;
     }
+
+    public bool canSwap(int x1, int y1, int x2, int y2)
+    {
+        return board.canSwap(x1, y1, x2, y2);
+    }
 }

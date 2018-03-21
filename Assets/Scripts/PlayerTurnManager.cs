@@ -46,10 +46,29 @@ public class PlayerTurnManager : MonoBehaviour {
                     var space = hit.transform.GetComponent<BoardSpaceStruct>();
                     var card = space.getCard();
                     //Swap functionality
-                    if (swapflag && card != null && SelectedSpace != null)
+                    if (swapflag && SelectedSpace != null)
                     {
+                        //attempting to swap with empty space
+                        if (card == null)
+                        {
+
+                        }
                         //check for same space swap
                         if (SelectedSpace.x == space.x && SelectedSpace.y == space.y) {return;}
+
+                        else
+                        {
+                            //Checks for valid swap
+                            if (manager.gameModel.canSwap(SelectedSpace.x, SelectedSpace.y, space.x, space.y))
+                            {
+                                manager.gameModel.SwapCards(0, SelectedSpace.x, SelectedSpace.y, space.x, space.y);
+                                manager.updateBoard();
+                                SelectedSpace.setOutlineColor(0);
+                                SelectedSpace = null;
+                                FindObjectOfType<buttonManager>().Deselect();
+                                swapflag = false;
+                            }
+                        }
                     }
                     //Select/Deselect Space
                     else if (card != null)

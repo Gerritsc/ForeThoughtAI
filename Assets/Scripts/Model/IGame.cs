@@ -53,7 +53,6 @@ public interface IGame
     /// <param name="cards"></param>
     List<ICard> sortbyValue(List<ICard> cards);
 
-
     /// <summary>
     /// Removes a card at the given location, if the given player has not already removed a card this game.
     /// Cards in the corners or center can NOT be removed, and this will return an error.
@@ -75,4 +74,16 @@ public interface IGame
 	/// </summary>
 	/// <returns>The hand.</returns>
 	List<ICard> getHand ();
+
+    /// <summary>
+    /// Returns whether the 2 positions are a valid swappable positions.
+    /// In order to be valid, there must be a card at both positions, and they must either be both face up,
+    /// or both face down
+    /// </summary>
+    /// <param name="x1">x pos of first space</param>
+    /// <param name="y1">y pos of first space</param>
+    /// <param name="x2">x pos of second space</param>
+    /// <param name="y2">y pos of second space</param>
+    /// <returns>true if the two positions can be swapped</returns>
+    bool canSwap(int x1, int y1, int x2, int y2);
 }
