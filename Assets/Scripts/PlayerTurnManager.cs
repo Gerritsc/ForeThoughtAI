@@ -119,6 +119,12 @@ public class PlayerTurnManager : MonoBehaviour {
         {
             SelectedCard = cardspace;
             cardspace.setOutlineColor(1);
+            if (SelectedSpace != null)
+            {
+                SelectedSpace.setOutlineColor(0);
+                SelectedSpace = null;
+                FindObjectOfType<buttonManager>().Deselect();
+            }
         }
     }
 
@@ -142,6 +148,11 @@ public class PlayerTurnManager : MonoBehaviour {
         {
             SelectedSpace = space;
             space.setOutlineColor(1);
+            if (SelectedCard != null)
+            {
+                SelectedCard.setOutlineColor(0);
+                SelectedCard = null;
+            }
             onSpaceSelect(SelectedSpace, manager.gameModel);
 
         }
@@ -151,8 +162,9 @@ public class PlayerTurnManager : MonoBehaviour {
     {
         swapflag = false;
         SelectedSpace.setOutlineColor(0);
+        SelectedCard.setOutlineColor(0);
         SelectedSpace = null;
-        //SelectedCard = null;
+        SelectedCard = null;
         FindObjectOfType<buttonManager>().Deselect();
     }
 }
