@@ -25,7 +25,6 @@ public class HandRender : MonoBehaviour {
     private void OnEnable()
     {
         FindObjectOfType<ModelManager>().OnBoardChange += UpdateHand;
-        InitHand();
     }
 
     private void OnDisable()
@@ -33,7 +32,7 @@ public class HandRender : MonoBehaviour {
         FindObjectOfType<ModelManager>().OnBoardChange -= UpdateHand;
     }
 
-    void InitHand () {
+    public void InitHand () {
 		hand = FindObjectOfType<ModelManager> ().gameModel.getHand ();
         cards = new GameObject[5];
 		var cardtosprite = FindObjectOfType<CardToSprite>();
@@ -43,6 +42,7 @@ public class HandRender : MonoBehaviour {
 			obj.transform.Rotate(new Vector3(90, 0, 0));
 			obj.transform.localScale = new Vector3(2, 2, 2);
 			obj.transform.position = new Vector3(startX + (i * X_OFFSET), cardHeight, startY);
+            obj.transform.parent = this.gameObject.transform;
 			obj.AddComponent<SpriteRenderer>();
 			obj.AddComponent<cakeslice.Outline>();
 			var col = obj.AddComponent<BoxCollider>();

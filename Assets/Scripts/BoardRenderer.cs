@@ -42,7 +42,7 @@ public class BoardRenderer : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Awake () {
+    public void initBoard () {
         board = FindObjectOfType<ModelManager>().gameModel.getBoard();
         //background.transform.localScale = new Vector3(BOARDWIDTH, 0, BOARDWIDTH);
         boardobjects = new GameObject[ROWCOUNT, ROWCOUNT];
