@@ -201,4 +201,8 @@ public class Game : IGame
     {
         return board.canSwap(x1, y1, x2, y2);
     }
+
+	public string[][] getTurnPlayerBoard(){
+		return null;
+	}
 }
