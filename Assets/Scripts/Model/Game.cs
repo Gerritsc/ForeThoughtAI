@@ -202,7 +202,11 @@ public class Game : IGame
         return board.canSwap(x1, y1, x2, y2);
     }
 
-	public string[][] getTurnPlayerBoard(){
+	public string[][] getBoardAsString (IBoard board, int playerTurn){
+		return null;
+	}
+
+	public List<GameMove> getAllPlayerMoves (IBoard board,  int playerTurn){
 		return null;
 	}
 }

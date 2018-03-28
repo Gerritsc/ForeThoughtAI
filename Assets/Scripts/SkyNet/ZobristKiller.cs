@@ -41,10 +41,12 @@ public class ZobristKiller {
 						int ind = boardPosToHashInd (j, k, allStrings [i]);
 						byte[] randBString = new byte[16];
 						(new RNGCryptoServiceProvider ()).GetBytes (randBString);
-						boardHashConst [ind] = System.BitConverter.ToString (randBString);
+						boardHashConst [ind] = Encoding.UTF8.GetString (randBString);
 					}
 				}
 			}
+
+			Save ();
 		}
 	}
 
@@ -64,8 +66,10 @@ public class ZobristKiller {
 		for (int i = 0; i < board.Length; i++) {
 			for (int j = 0; j < board [i].Length; j++){
 				byte[] constHash = new byte[16];
-				constHash = System.BitConverter.GetBytes (boardHashConst[boardPosToHashInd(i, j, board[i][j])]);
-				hash = (byte[])(hash ^ constHash);
+				int index = boardPosToHashInd (i, j, board [i] [j]);
+				string boardHash = boardHashConst [index];
+				constHash = Encoding.UTF8.GetBytes (boardHash);
+				hash = xorByteArrays (hash, constHash, 16);
 			}
 		}
 		return System.Text.Encoding.UTF8.GetString(hash);
@@ -78,6 +82,13 @@ public class ZobristKiller {
 		FileStream file = File.Create(Application.persistentDataPath + "/SkyNetData/zobristHash.dat");
 		bf.Serialize (file, hashAndSlasher.boardHashConst);
 		file.Close();
+	}
+
+	public byte[] xorByteArrays(byte[] a1, byte[] a2, int size){
+		for (int i = 0; i < size; i++) {
+			a1 [i] ^= a2 [i];
+		}
+		return a1;
 	}
 
 	public static bool Load()

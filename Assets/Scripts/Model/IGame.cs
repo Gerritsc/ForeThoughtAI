@@ -94,5 +94,7 @@ public interface IGame
 	/// Known cards are in a "X of Y" format, where X is value and Y is Suit/Color
 	/// </summary>
 	/// <returns>The turn player's board.</returns>
-	string[][] getTurnPlayerBoard ();
+	string[][] getBoardAsString (IBoard board, int playerTurn);
+
+	List<GameMove> getAllPlayerMoves (IBoard board,  int playerTurn);
 }
