@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-public enum Suit { Hearts, Clubs, Diamonds, Spades }
+public enum Suit { Hearts = 0, Clubs, Diamonds, Spades}
 /// <summary>
 /// Represents a Standard deck of playing cards
 /// </summary>

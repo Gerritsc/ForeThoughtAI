@@ -21,7 +21,7 @@ public class PlayingCard : ICard
         else
         {
             throw new ArgumentException("Invalid Value.  Must be between 2 and 14");
-        }
+        } 
     }
 
     /// <summary>
