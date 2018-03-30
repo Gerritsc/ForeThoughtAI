@@ -202,11 +202,15 @@ public class Game : IGame
         return board.canSwap(x1, y1, x2, y2);
     }
 
-	public string[][] getBoardAsString (IBoard board, int playerTurn){
+	public string[][] getBoardAsString (IBoard board, bool playerOne){
 		return null;
 	}
 
-	public List<GameMove> getAllPlayerMoves (IBoard board,  int playerTurn){
+	public List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne){
 		return null;
+	}
+
+	public bool isPlayerOneTurn(){
+		return (playerturn == 0);
 	}
 }

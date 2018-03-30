@@ -1,29 +1,71 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class RLBrain {
+	//I will name you Squishy, and you will be mine! My Squishy!
+	private static RLBrain squishy = new RLBrain();
 
-	struct SkyNetMove {
-		float visitCount;
-		float winCount;
+	private List<SkyNetNode> skyNetTreeRoots;
 
+	private int numPlaythroughs = 100;
 
-		SkyNetMove(float vc, float wc){
-			visitCount = vc;
-			winCount = wc;
+	private RLBrain(){
+		skyNetTreeRoots = new List<SkyNetNode> ();
+	}
+
+	public RLBrain FindSquishy(){
+		return squishy;
+	}
+
+	public void SelfTeach(int numThoughts){
+		
+		for (int i = 0; i < numThoughts; i++) {
+			ThreadPool.QueueUserWorkItem (TrainOfThought);
 		}
-	};
 
-	Dictionary<string[], List<SkyNetMove>> memoryBank;
+		int numAvail = 0;
+		int other1 = 0;
+		int maxThreads = 0;
+		int other2 = 0;
+		int numRunning = 0;
 
-	// Use this for initialization
-	void Start () {
-		
+		do{
+			ThreadPool.GetAvailableThreads (out numAvail, out other1);
+			ThreadPool.GetMaxThreads (out maxThreads, out other2);
+			numRunning = (maxThreads - numAvail) + (other2 - other1);
+		}while(numRunning > 0);
+
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	public void TrainOfThought(object stateInfo){
+		IGame game = new Game ();
+		MCTSkyNet squishyThought = new MCTSkyNet (game, game.isPlayerOneTurn ());
+		for (int i = 0; i < numPlaythroughs; i++) {
+			squishyThought.MCTSSingleIteration ();
+		}
+		SkyNetNode newRoot = squishyThought.GetRoot ();
+
 	}
+
+	private void updateRootList(SkyNetNode newRoot){
+		int oldInd = skyNetTreeRoots.IndexOf (newRoot);
+		if(oldInd >= 0) {
+			MergeTrees (skyNetTreeRoots[oldInd], newRoot);
+		} else {
+			skyNetTreeRoots.Add(newRoot);
+		}
+	}
+
+	private void MergeTrees(SkyNetNode oldRoot, SkyNetNode newRoot){
+		oldRoot.visitCnt += newRoot.visitCnt;
+		oldRoot.winCnt += newRoot.visitCnt;
+		foreach (SkyNetNode newchild in newRoot.children) {
+			if (oldRoot.children.Contains (newchild)) {
+
+			}
+		}
+	}
+
 }

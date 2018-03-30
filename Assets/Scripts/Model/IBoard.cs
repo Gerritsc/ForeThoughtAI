@@ -59,6 +59,27 @@ public class GameMove {
 		}
 		return false;
 	}
+
+	public override string ToString ()
+	{
+		string typeStr = "";
+		string typeSpecificStr = "";
+		switch (this.type) {
+		case MoveType.ADD:
+			typeStr = "ADD";
+			typeSpecificStr = String.Format ("X-Pos: {1}\nY-Pos: {2}\n{3}", x1.ToString(), y1.ToString(), card.ToString());
+			break;
+		case MoveType.SWAP:
+			typeStr = "SWAP";
+			typeSpecificStr = String.Format ("Orig X-Pos: {1}\nOrig Y-Pos: {2}\nNext X-Pos: {3}\n Next Y-Pos: {4}", x1.ToString(), y1.ToString(), x2.ToString(), y2.ToString());
+			break;
+		case MoveType.REMOVE:
+			typeStr = "REMOVE";
+			typeSpecificStr = String.Format ("X-Pos: {1}\nY-Pos: {2}", x1.ToString(), y1.ToString());
+			break;
+		}
+		return string.Format ("[GameMove]\n{1}\n{2}", typeStr, typeSpecificStr);
+	}
 }
 
 public interface IBoard
