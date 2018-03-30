@@ -213,4 +213,14 @@ public class Game : IGame
 	public bool isPlayerOneTurn(){
 		return (playerturn == 0);
 	}
+
+    public bool isFullColumn(int columnnumber)
+    {
+        return board.isFullColumn(columnnumber);
+    }
+
+    public bool isFullRow(int rownumber)
+    {
+        return board.isFullRow(rownumber);
+    }
 }

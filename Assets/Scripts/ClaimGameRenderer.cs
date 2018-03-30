@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClaimGameRenderer : MonoBehaviour {
+public class ClaimGameRenderer : MonoBehaviour
+{
 
     [SerializeField]
     float X_OFFSET;
@@ -22,16 +23,6 @@ public class ClaimGameRenderer : MonoBehaviour {
 
     IBoard board;
 
-    private void OnEnable()
-    {
-        FindObjectOfType<ModelManager>().OnBoardChange += UpdateClaims;
-    }
-
-    private void OnDisable()
-    {
-        FindObjectOfType<ModelManager>().OnBoardChange -= UpdateClaims;
-    }
-
     public void initClaims()
     {
         board = FindObjectOfType<ModelManager>().gameModel.getBoard();
@@ -39,10 +30,10 @@ public class ClaimGameRenderer : MonoBehaviour {
         VerticalButtons = new GameObject[board.GetBoardDimensions()];
         Diagonals = new GameObject[2];
         //Horizontal 
-        for (int x = 0; x < HorizontalButtons.Length; x ++)
+        for (int x = 0; x < HorizontalButtons.Length; x++)
         {
             var obj = new GameObject();
-            obj.gameObject.name = "Claim: " + x.ToString();
+            obj.gameObject.name = "Claim Horizontal: " + x.ToString();
             obj.tag = "ClaimGame";
             obj.transform.Rotate(new Vector3(90, 0, 180));
             obj.transform.localScale = new Vector3(.2f, .2f, .2f);
@@ -61,11 +52,11 @@ public class ClaimGameRenderer : MonoBehaviour {
         for (int y = 0; y < VerticalButtons.Length; y++)
         {
             var obj = new GameObject();
-            obj.gameObject.name = "Claim: " + y.ToString();
+            obj.gameObject.name = "Claim Vertical: " + y.ToString();
             obj.tag = "ClaimGame";
             obj.transform.Rotate(new Vector3(90, 0, -90));
             obj.transform.localScale = new Vector3(.2f, .2f, .2f);
-            obj.transform.position = new Vector3(Start_X - X_OFFSET , 1.01f, Start_Y +((y + 1)  * Y_OFFSET));
+            obj.transform.position = new Vector3(Start_X - X_OFFSET, 1.01f, Start_Y + ((y + 1) * Y_OFFSET));
             obj.transform.parent = this.gameObject.transform;
             var renderer = obj.AddComponent<SpriteRenderer>();
             renderer.sprite = icon;
@@ -80,15 +71,16 @@ public class ClaimGameRenderer : MonoBehaviour {
         initDiagonals();
     }
 
-	// Use this for initialization
-	private void initDiagonals() {
+    // Use this for initialization
+    private void initDiagonals()
+    {
         //Diagonals
         var diagonal = new GameObject();
         diagonal.gameObject.name = "Diagonal1";
         diagonal.tag = "ClaimGame";
         diagonal.transform.Rotate(new Vector3(90, 0, -135));
         diagonal.transform.localScale = new Vector3(.2f, .2f, .2f);
-        diagonal.transform.position = new Vector3(Start_X - X_OFFSET, 1.01f, Start_Y -1);
+        diagonal.transform.position = new Vector3(Start_X - X_OFFSET, 1.01f, Start_Y - 1);
         diagonal.transform.parent = this.gameObject.transform;
         var drender = diagonal.AddComponent<SpriteRenderer>();
         drender.sprite = icon;
@@ -105,7 +97,7 @@ public class ClaimGameRenderer : MonoBehaviour {
         diagonal.tag = "ClaimGame";
         diagonal.transform.Rotate(new Vector3(90, 0, 135));
         diagonal.transform.localScale = new Vector3(.2f, .2f, .2f);
-        diagonal.transform.position = new Vector3(Start_X -.5f + (X_OFFSET * (board.GetBoardDimensions())), 1.01f, Start_Y -1);
+        diagonal.transform.position = new Vector3(Start_X - .5f + (X_OFFSET * (board.GetBoardDimensions())), 1.01f, Start_Y - 1);
         diagonal.transform.parent = this.gameObject.transform;
         drender = diagonal.AddComponent<SpriteRenderer>();
         drender.sprite = icon;
@@ -119,27 +111,38 @@ public class ClaimGameRenderer : MonoBehaviour {
     }
 
 
-    void UpdateClaims(IGame model)
+    public void EnableClaims(IGame model)
     {
-
-        if (FindObjectOfType<ModelManager>().currentstate == ModelManager.GameState.PlayerClaim)
+        for (int x = 0; x < HorizontalButtons.Length; x++)
         {
-
+            if (model.isFullColumn(x))
+            {
+                HorizontalButtons[x].SetActive(true);
+            }
         }
-        else
+
+        for (int y = 0; y < VerticalButtons.Length; y++)
         {
-            foreach (var elem in HorizontalButtons)
+             if (model.isFullRow(y))
             {
-                elem.SetActive(false);
+                VerticalButtons[y].SetActive(true);
             }
-            foreach (var elem in VerticalButtons)
-            {
-                elem.SetActive(false);
-            }
-            foreach (var elem in Diagonals)
-            {
-                elem.SetActive(false);
-            }
+        }
+    }
+
+    public void disableClaims()
+    {
+        foreach (var elem in HorizontalButtons)
+        {
+            elem.SetActive(false);
+        }
+        foreach (var elem in VerticalButtons)
+        {
+            elem.SetActive(false);
+        }
+        foreach (var elem in Diagonals)
+        {
+            elem.SetActive(false);
         }
     }
 }

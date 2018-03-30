@@ -8,7 +8,7 @@ public class ModelManager : MonoBehaviour
     public IGame gameModel;
 
     [SerializeField]
-    public GameState currentstate;
+    private GameState currentstate;
 
     public delegate void BoardChangeAction(IGame gameModel);
     public event BoardChangeAction OnBoardChange;
@@ -48,13 +48,14 @@ public class ModelManager : MonoBehaviour
                     //Switch after player makes an action to claim/end phase
                     currentstate = GameState.PlayerClaim;
                     FindObjectOfType<PlayerTurnManager>().enabled = false;
-
+                    FindObjectOfType<ClaimGameRenderer>().EnableClaims(gameModel);
                     break;
                 }
             case GameState.PlayerClaim:
                 {
                     //Switch from claim phase to enemy turn
                     currentstate = GameState.EnemyTurn;
+                    FindObjectOfType<ClaimGameRenderer>().disableClaims();
                     break;
                 }
         }

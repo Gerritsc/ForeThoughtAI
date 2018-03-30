@@ -96,7 +96,27 @@ public interface IGame
 	/// <returns>The turn player's board.</returns>
 	string[][] getBoardAsString (IBoard board, bool playerOne);
 
+    /// <summary>
+    /// Gets all valid player moves for the given player.
+    /// </summary>
+    /// <param name="board">current board state</param>
+    /// <param name="playerOne">whose turn it is</param>
+    /// <returns></returns>
 	List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne);
 
 	bool isPlayerOneTurn();
+
+    /// <summary>
+    /// Checks if a given column is full of cards, indicating that it can be a claimed for a win
+    /// </summary>
+    /// <param name="columnnumber">the row to check, 0 indexed</param>
+    /// <returns></returns>
+    bool isFullColumn(int columnnumber);
+
+    /// <summary>
+    /// Checks if a given column is full of cards, indicating that it 
+    /// </summary>
+    /// <param name="rownumber"></param>
+    /// <returns></returns>
+    bool isFullRow(int rownumber);
 }

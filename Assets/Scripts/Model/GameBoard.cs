@@ -155,4 +155,32 @@ class GameBoard : IBoard
         }
         return true;
     }
+
+    public bool isFullColumn(int columnnum)
+    {
+        int numcards = 0;
+        for (int y = 0;  y < GRIDSIZE; y ++)
+        {
+            if (board[columnnum,y].getCard() != null)
+            {
+                numcards++;
+            }
+        }
+
+        return numcards == GRIDSIZE;
+    }
+
+    public bool isFullRow(int rownum)
+    {
+        int numcards = 0;
+        for (int x = 0; x < GRIDSIZE; x++)
+        {
+            if (board[x, rownum].getCard() != null)
+            {
+                numcards++;
+            }
+        }
+
+        return numcards == GRIDSIZE;
+    }
 }
