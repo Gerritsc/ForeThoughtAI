@@ -17,8 +17,14 @@ public class ClaimGameRenderer : MonoBehaviour
     [SerializeField]
     Sprite icon;
 
-    GameObject[] HorizontalButtons;
-    GameObject[] VerticalButtons;
+    /// <summary>
+    /// Buttons that stretch horizontally across the game board. STORES BUTTONS FOR COLUMNS 
+    /// </summary>
+    GameObject[] ColumnButtons;
+    /// <summary>
+    /// Buttons that stretch vertically down the side of the board.  STORES BUTTONS FOR ROWS
+    /// </summary>
+    GameObject[] RowButtons;
     GameObject[] Diagonals;
 
     IBoard board;
@@ -26,11 +32,11 @@ public class ClaimGameRenderer : MonoBehaviour
     public void initClaims()
     {
         board = FindObjectOfType<ModelManager>().gameModel.getBoard();
-        HorizontalButtons = new GameObject[board.GetBoardDimensions()];
-        VerticalButtons = new GameObject[board.GetBoardDimensions()];
+        ColumnButtons = new GameObject[board.GetBoardDimensions()];
+        RowButtons = new GameObject[board.GetBoardDimensions()];
         Diagonals = new GameObject[2];
         //Horizontal 
-        for (int x = 0; x < HorizontalButtons.Length; x++)
+        for (int x = 0; x < ColumnButtons.Length; x++)
         {
             var obj = new GameObject();
             obj.gameObject.name = "Claim Horizontal: " + x.ToString();
@@ -43,13 +49,16 @@ public class ClaimGameRenderer : MonoBehaviour
             renderer.sprite = icon;
             obj.AddComponent<cakeslice.Outline>();
             var col = obj.AddComponent<BoxCollider>();
+            var spacestruct = obj.AddComponent<ClaimGameStruct>();
+            spacestruct.depthnumber = x;
+            spacestruct.direction = ClaimGameStruct.Direction.Column;
             col.size = new Vector3(10, 10f, 6f);
             col.isTrigger = true;
             obj.SetActive(false);
-            HorizontalButtons[x] = obj;
+            ColumnButtons[x] = obj;
         }
 
-        for (int y = 0; y < VerticalButtons.Length; y++)
+        for (int y = 0; y < RowButtons.Length; y++)
         {
             var obj = new GameObject();
             obj.gameObject.name = "Claim Vertical: " + y.ToString();
@@ -62,11 +71,16 @@ public class ClaimGameRenderer : MonoBehaviour
             renderer.sprite = icon;
             obj.AddComponent<cakeslice.Outline>();
             var col = obj.AddComponent<BoxCollider>();
+
+            var spacestruct = obj.AddComponent<ClaimGameStruct>();
+            spacestruct.depthnumber = y;
+            spacestruct.direction = ClaimGameStruct.Direction.Row;
+
             col.size = new Vector3(10, 8f, 6f);
             col.isTrigger = true;
             obj.SetActive(false);
 
-            VerticalButtons[y] = obj;
+            RowButtons[y] = obj;
         }
         initDiagonals();
     }
@@ -75,57 +89,68 @@ public class ClaimGameRenderer : MonoBehaviour
     private void initDiagonals()
     {
         //Diagonals
-        var diagonal = new GameObject();
-        diagonal.gameObject.name = "Diagonal1";
-        diagonal.tag = "ClaimGame";
-        diagonal.transform.Rotate(new Vector3(90, 0, -135));
-        diagonal.transform.localScale = new Vector3(.2f, .2f, .2f);
-        diagonal.transform.position = new Vector3(Start_X - X_OFFSET, 1.01f, Start_Y - 1);
-        diagonal.transform.parent = this.gameObject.transform;
-        var drender = diagonal.AddComponent<SpriteRenderer>();
+        var obj  = new GameObject();
+        obj.gameObject.name = "Diagonal1";
+        obj.tag = "ClaimGame";
+        obj.transform.Rotate(new Vector3(90, 0, -135));
+        obj.transform.localScale = new Vector3(.2f, .2f, .2f);
+        obj.transform.position = new Vector3(Start_X - X_OFFSET, 1.01f, Start_Y - 1);
+        obj.transform.parent = this.gameObject.transform;
+        var drender = obj.AddComponent<SpriteRenderer>();
         drender.sprite = icon;
-        diagonal.AddComponent<cakeslice.Outline>();
-        var dcol = diagonal.AddComponent<BoxCollider>();
+        obj.AddComponent<cakeslice.Outline>();
+        var dcol = obj.AddComponent<BoxCollider>();
+
+        var spacestruct = obj.AddComponent<ClaimGameStruct>();
+        spacestruct.depthnumber = 0;
+        spacestruct.direction = ClaimGameStruct.Direction.Diagonal;
+
         dcol.size = new Vector3(10, 8f, 6f);
         dcol.isTrigger = true;
-        diagonal.SetActive(false);
-        Diagonals[0] = diagonal;
+        obj.SetActive(false);
+        Diagonals[0] = obj;
 
 
-        diagonal = new GameObject();
-        diagonal.gameObject.name = "Diagonal2";
-        diagonal.tag = "ClaimGame";
-        diagonal.transform.Rotate(new Vector3(90, 0, 135));
-        diagonal.transform.localScale = new Vector3(.2f, .2f, .2f);
-        diagonal.transform.position = new Vector3(Start_X - .5f + (X_OFFSET * (board.GetBoardDimensions())), 1.01f, Start_Y - 1);
-        diagonal.transform.parent = this.gameObject.transform;
-        drender = diagonal.AddComponent<SpriteRenderer>();
+        obj = new GameObject();
+        obj.gameObject.name = "Diagonal2";
+        obj.tag = "ClaimGame";
+        obj.transform.Rotate(new Vector3(90, 0, 135));
+        obj.transform.localScale = new Vector3(.2f, .2f, .2f);
+        obj.transform.position = new Vector3(Start_X - .5f + (X_OFFSET * (board.GetBoardDimensions())), 1.01f, Start_Y - 1);
+        obj.transform.parent = this.gameObject.transform;
+        drender = obj.AddComponent<SpriteRenderer>();
         drender.sprite = icon;
-        diagonal.AddComponent<cakeslice.Outline>();
-        dcol = diagonal.AddComponent<BoxCollider>();
+        obj.AddComponent<cakeslice.Outline>();
+        dcol = obj.AddComponent<BoxCollider>();
+
+        spacestruct = obj.AddComponent<ClaimGameStruct>();
+        spacestruct.depthnumber = 1;
+        spacestruct.direction = ClaimGameStruct.Direction.Diagonal;
+
+
         dcol.size = new Vector3(10, 8f, 6f);
         dcol.isTrigger = true;
-        diagonal.SetActive(false);
+        obj.SetActive(false);
 
-        Diagonals[1] = diagonal;
+        Diagonals[1] = obj;
     }
 
 
     public void EnableClaims(IGame model)
     {
-        for (int x = 0; x < HorizontalButtons.Length; x++)
+        for (int x = 0; x < ColumnButtons.Length; x++)
         {
             if (model.isFullColumn(x))
             {
-                HorizontalButtons[x].SetActive(true);
+                ColumnButtons[x].SetActive(true);
             }
         }
 
-        for (int y = 0; y < VerticalButtons.Length; y++)
+        for (int y = 0; y < RowButtons.Length; y++)
         {
              if (model.isFullRow(y))
             {
-                VerticalButtons[y].SetActive(true);
+                RowButtons[y].SetActive(true);
             }
         }
         for (int x = 0; x < Diagonals.Length; x ++)
@@ -139,11 +164,11 @@ public class ClaimGameRenderer : MonoBehaviour
 
     public void disableClaims()
     {
-        foreach (var elem in HorizontalButtons)
+        foreach (var elem in ColumnButtons)
         {
             elem.SetActive(false);
         }
-        foreach (var elem in VerticalButtons)
+        foreach (var elem in RowButtons)
         {
             elem.SetActive(false);
         }

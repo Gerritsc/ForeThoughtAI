@@ -13,9 +13,6 @@ public class ModelManager : MonoBehaviour
     public delegate void BoardChangeAction(IGame gameModel);
     public event BoardChangeAction OnBoardChange;
 
-    
-
-
     public enum GameState
     {
         PlayerPlay, PlayerClaim, EnemyTurn
@@ -48,6 +45,7 @@ public class ModelManager : MonoBehaviour
                     //Switch after player makes an action to claim/end phase
                     currentstate = GameState.PlayerClaim;
                     FindObjectOfType<PlayerTurnManager>().enabled = false;
+                    FindObjectOfType<ClaimManager>().enabled = true;
                     FindObjectOfType<ClaimGameRenderer>().EnableClaims(gameModel);
                     break;
                 }
@@ -55,6 +53,7 @@ public class ModelManager : MonoBehaviour
                 {
                     //Switch from claim phase to enemy turn
                     currentstate = GameState.EnemyTurn;
+                    FindObjectOfType<ClaimManager>().enabled = false;
                     FindObjectOfType<ClaimGameRenderer>().disableClaims();
                     break;
                 }

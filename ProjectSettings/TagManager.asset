@@ -6,6 +6,7 @@ TagManager:
   tags:
   - BoardSpace
   - Hand
+  - ClaimGame
   layers:
   - Default
   - TransparentFX
