@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ModelManager : MonoBehaviour
 {
 
     public IGame gameModel;
+
+    [SerializeField]
+    Text DisplayTurn;
 
     [SerializeField]
     private GameState currentstate;
@@ -58,6 +62,7 @@ public class ModelManager : MonoBehaviour
                     break;
                 }
         }
+        changeDisplayText();
     }
 
     private void Update()
@@ -78,4 +83,31 @@ public class ModelManager : MonoBehaviour
     {
         OnBoardChange(gameModel);
     }
+
+
+    /// <summary>
+    /// Changes display text to display Current State
+    /// </summary>
+    private void changeDisplayText()
+    {
+        switch (currentstate)
+        {
+            case GameState.EnemyTurn:
+                {
+                    DisplayTurn.text = "Enemy Turn";
+                    break;
+                }
+            case GameState.PlayerPlay:
+                {
+                    DisplayTurn.text = "Player Play Phase";
+                    break;
+                }
+            case GameState.PlayerClaim:
+                {
+                    DisplayTurn.text = "Claim Win/End of Turn Phase";
+                    break;
+                }
+        }
+
+        }
 }

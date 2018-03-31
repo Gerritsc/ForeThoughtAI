@@ -57,11 +57,11 @@ public class ClaimGameStruct : MonoBehaviour
                 {
                     if (depthnumber == 0)
                     {
-
+                        ret = (from x in FindObjectsOfType<BoardSpaceStruct>() where x.x == x.y select x).ToArray();
                     }
                     else if (depthnumber == 1)
                     {
-
+                        ret = (from x in FindObjectsOfType<BoardSpaceStruct>() where x.x + x.y == ret.Length -1 select x).ToArray();
                     }
                     else
                     {
