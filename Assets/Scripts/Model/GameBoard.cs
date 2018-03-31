@@ -183,4 +183,35 @@ class GameBoard : IBoard
 
         return numcards == GRIDSIZE;
     }
+
+    public bool isFullDiagonal(bool StartLeft)
+    {
+        int numcards = 0;
+        int Yval;
+        if (StartLeft)
+        {
+            Yval = 0;
+        }
+        else
+        {
+            Yval = GRIDSIZE -1;
+        }
+        for (int x = 0; x < GRIDSIZE; x ++)
+        {
+            if (board[x, Yval].getCard() != null)
+            {
+                numcards++;
+            }
+
+            if (StartLeft)
+            {
+                Yval++;
+            }
+            else
+            {
+                Yval--;
+            }
+        }
+        return numcards == GRIDSIZE;
+    }
 }

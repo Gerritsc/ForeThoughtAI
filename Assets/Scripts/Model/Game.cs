@@ -223,4 +223,9 @@ public class Game : IGame
     {
         return board.isFullRow(rownumber);
     }
+
+    public bool isFullDiagonal(bool StartLeft)
+    {
+        return board.isFullDiagonal(StartLeft);
+    }
 }

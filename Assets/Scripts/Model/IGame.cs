@@ -110,13 +110,20 @@ public interface IGame
     /// Checks if a given column is full of cards, indicating that it can be a claimed for a win
     /// </summary>
     /// <param name="columnnumber">the row to check, 0 indexed</param>
-    /// <returns></returns>
+    /// <returns>true if the column is full </returns>
     bool isFullColumn(int columnnumber);
 
     /// <summary>
     /// Checks if a given column is full of cards, indicating that it 
     /// </summary>
     /// <param name="rownumber"></param>
-    /// <returns></returns>
+    /// <returns>true if the row is full</returns>
     bool isFullRow(int rownumber);
+
+    /// <summary>
+    /// checks if a given diagonal is full of cards.
+    /// </summary>
+    /// <param name="diagonal"> True if the diagonal begins in the top left, false if it starts in top right</param>
+    /// <returns>true if the diagonal is full</returns>
+    bool isFullDiagonal(bool StartLeft);
 }

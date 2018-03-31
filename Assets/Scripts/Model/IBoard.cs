@@ -76,4 +76,6 @@ public interface IBoard
     /// <param name="rownum"></param>
     /// <returns></returns>
     bool isFullRow(int rownum);
+
+    bool isFullDiagonal(bool StartLeft);
 }

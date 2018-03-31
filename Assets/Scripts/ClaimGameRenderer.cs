@@ -128,6 +128,13 @@ public class ClaimGameRenderer : MonoBehaviour
                 VerticalButtons[y].SetActive(true);
             }
         }
+        for (int x = 0; x < Diagonals.Length; x ++)
+        {
+            if (model.isFullDiagonal((x == 0)))
+            {
+                Diagonals[x].SetActive(true);
+            }
+        }
     }
 
     public void disableClaims()
