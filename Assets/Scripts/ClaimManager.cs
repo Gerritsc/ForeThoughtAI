@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ClaimManager : MonoBehaviour {
@@ -10,6 +11,8 @@ public class ClaimManager : MonoBehaviour {
     public delegate void SpaceSelectAction(ClaimGameStruct selected, BoardSpaceStruct[] cards);
     public event SpaceSelectAction onClaimSelect;
     public event SpaceSelectAction onClaimDeselect;
+
+    ModelManager model;
 
     private void OnEnable()
     {
@@ -25,6 +28,7 @@ public class ClaimManager : MonoBehaviour {
     // Use this for initialization
     void Awake()
     {
+        model = FindObjectOfType<ModelManager>();
         selectedButton = null;
         selectedCards = new BoardSpaceStruct[5];
     }
@@ -99,6 +103,38 @@ public class ClaimManager : MonoBehaviour {
             {
                 space.setOutlineColor(index);
             }
+        }
+    }
+
+    public void CheckClaim(string type)
+    {
+        bool win = false;
+        List<ICard> cardset = (from card in selectedCards select card.getCard()).ToList();
+        switch (type)
+        {
+            case "FLUSH": {
+                    win = model.gameModel.CheckGameOverClaim(cardset, HANDTYPE.FLUSH);
+                    break;
+                }
+            case "STRAIGHT":
+                {
+                    win = model.gameModel.CheckGameOverClaim(cardset, HANDTYPE.STRAIGHT);
+                    break;
+                }
+            case "FULLHOUSE":
+                {
+                    win = model.gameModel.CheckGameOverClaim(cardset, HANDTYPE.FULLHOUSE);
+                    break;
+                }
+            case "FOURKIND":
+                {
+                    win = model.gameModel.CheckGameOverClaim(cardset, HANDTYPE.FOURKIND);
+                    break;
+                }
+        }
+        if (win)
+        {
+            model.GameWon();
         }
     }
 }

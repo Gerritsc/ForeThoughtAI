@@ -19,7 +19,7 @@ public class ModelManager : MonoBehaviour
 
     public enum GameState
     {
-        PlayerPlay, PlayerClaim, EnemyTurn
+        PlayerPlay, PlayerClaim, EnemyTurn, WinState
     }
 
     // Use this for initialization
@@ -107,7 +107,23 @@ public class ModelManager : MonoBehaviour
                     DisplayTurn.text = "Claim Win/End of Turn Phase";
                     break;
                 }
+            case GameState.WinState:
+                {
+                    DisplayTurn.text = "You Win goodsir";
+                    break;
+                }
         }
 
-        }
+    }
+
+    public void GameWon()
+    {
+        this.currentstate = GameState.WinState;
+
+        FindObjectOfType<ClaimManager>().enabled = false;
+        FindObjectOfType<ClaimGameRenderer>().disableClaims();
+
+        changeDisplayText();
+
+    }
 }

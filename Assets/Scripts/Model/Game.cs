@@ -127,6 +127,8 @@ public class Game : IGame
                     {
                         return (values[1] == 2 && values[2] == 3 && values[3] == 4 && values[4] == 5);
                     }
+
+
                     break;
                 }
             case HANDTYPE.FLUSH:
@@ -152,6 +154,9 @@ public class Game : IGame
                 }
             case HANDTYPE.FOURKIND:
                 {
+                    sortbyValue(cardset);
+                    int[] values = (from i in cardset select i.GetCardNumValue()).ToArray();
+                    return (values[1] == values[2] && values[2] == values[3]) && (values[0] == values[1] || values[4] == values[1]);
                     break;
                 }
 
