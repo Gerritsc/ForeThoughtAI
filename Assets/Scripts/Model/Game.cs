@@ -144,20 +144,17 @@ public class Game : IGame
                     return true;
                 }
             case HANDTYPE.FULLHOUSE:
-                {
-                    sortbyValue(cardset);
-
+                { 
                     int[] values = (from i in cardset select i.GetCardNumValue()).ToArray();
+                    Array.Sort(values);
                     return (values[0] == values[1] && values[3] == values[4] && (values[2] == values[1] || values[2] == values[3]));
-
-                    break;
                 }
             case HANDTYPE.FOURKIND:
                 {
                     sortbyValue(cardset);
                     int[] values = (from i in cardset select i.GetCardNumValue()).ToArray();
+                    Array.Sort(values);
                     return (values[1] == values[2] && values[2] == values[3]) && (values[0] == values[1] || values[4] == values[1]);
-                    break;
                 }
 
         }

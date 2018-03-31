@@ -113,6 +113,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!84 &32195155
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_Width: 1001
+  m_Height: 614
+  m_AntiAliasing: 1
+  m_DepthFormat: 1
+  m_ColorFormat: 0
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
 --- !u!1 &159604726
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,14 +299,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 175679036}
-  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: -0.01, y: 20, z: -20}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.01, y: 22, z: -7.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 961604765}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &175679041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -382,8 +413,8 @@ MonoBehaviour:
   sourceCamera: {fileID: 175679039}
   outlineCamera: {fileID: 961604764}
   outlineShaderMaterial: {fileID: 0}
-  renderTexture: {fileID: 576348607}
-  extraRenderTexture: {fileID: 781378836}
+  renderTexture: {fileID: 307064598}
+  extraRenderTexture: {fileID: 32195155}
 --- !u!114 &175679044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -503,7 +534,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!84 &576348607
+--- !u!84 &307064598
 RenderTexture:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -528,37 +559,6 @@ RenderTexture:
     serializedVersion: 2
     m_FilterMode: 1
     m_Aniso: 0
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
---- !u!84 &781378836
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_Width: 1001
-  m_Height: 614
-  m_AntiAliasing: 1
-  m_DepthFormat: 1
-  m_ColorFormat: 0
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
     m_MipBias: 0
     m_WrapU: 1
     m_WrapV: 1
@@ -595,7 +595,7 @@ MonoBehaviour:
   X_OFFSET: 2
   Y_OFFSET: 2
   startX: -4
-  startY: -19
+  startY: -17
   cardHeight: 1
 --- !u!4 &887725222
 Transform:
@@ -896,7 +896,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 0
   m_RenderingPath: 1
-  m_TargetTexture: {fileID: 576348607}
+  m_TargetTexture: {fileID: 307064598}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
@@ -1579,11 +1579,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014757b7075318d4b82c373f71f00fd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BOARDWIDTH: 30
+  BOARDWIDTH: 50
   X_OFFSET: 2.5
   Y_OFFSET: -3.5
   startX: -5
-  startY: -2
+  startY: 0
   cardHeight: 1.01
   background: {fileID: 1884982640}
 --- !u!4 &1603064694
@@ -1614,7 +1614,7 @@ MonoBehaviour:
   X_OFFSET: 2.5
   Y_OFFSET: -3.5
   Start_X: -5
-  Start_Y: 1.5
+  Start_Y: 3.5
   icon: {fileID: 21300000, guid: 6ed18a376c67ed44fb2e6d935ac5329e, type: 3}
 --- !u!1 &1725609882
 GameObject:
@@ -2050,14 +2050,14 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 20
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Current Turn
+  m_Text: Player Play Phase
 --- !u!222 &1840781470
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2143,7 +2143,7 @@ Transform:
   m_GameObject: {fileID: 1884982640}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 2}
-  m_LocalScale: {x: 20, y: 1, z: 24}
+  m_LocalScale: {x: 50, y: 1, z: 30}
   m_Children: []
   m_Father: {fileID: 1603064694}
   m_RootOrder: 0
