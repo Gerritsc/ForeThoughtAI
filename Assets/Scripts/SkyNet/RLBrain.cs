@@ -32,7 +32,7 @@ public class RLBrain {
 		int numRunning = 0;
 
 		do{
-			ThreadPool.GetAvailableThreads (out numAvail, out other1);
+			//ThreadPool.GetAvailableThreads(out numAvail, out other1);
 			ThreadPool.GetMaxThreads (out maxThreads, out other2);
 			numRunning = (maxThreads - numAvail) + (other2 - other1);
 		}while(numRunning > 0);

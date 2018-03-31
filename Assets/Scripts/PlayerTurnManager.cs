@@ -18,8 +18,14 @@ public class PlayerTurnManager : MonoBehaviour {
 
     bool swapflag;
 
-	// Use this for initialization
-	void Awake () {
+    private void OnDisable()
+    {
+        FindObjectOfType<buttonManager>().Deselect();
+        CancelActions();
+    }
+
+    // Use this for initialization
+    void Awake () {
         manager = FindObjectOfType<ModelManager>();
         SelectedSpace = null;
         SelectedCard = null;
@@ -48,27 +54,7 @@ public class PlayerTurnManager : MonoBehaviour {
                     //Swap functionality
                     if (swapflag && SelectedSpace != null)
                     {
-                        //attempting to swap with empty space
-                        if (card == null)
-                        {
-
-                        }
-                        //check for same space swap
-                        if (SelectedSpace.x == space.x && SelectedSpace.y == space.y) {return;}
-
-                        else
-                        {
-                            //Checks for valid swap
-                            if (manager.gameModel.canSwap(SelectedSpace.x, SelectedSpace.y, space.x, space.y))
-                            {
-                                manager.gameModel.SwapCards(0, SelectedSpace.x, SelectedSpace.y, space.x, space.y);
-                                manager.updateBoard();
-                                SelectedSpace.setOutlineColor(0);
-                                SelectedSpace = null;
-                                FindObjectOfType<buttonManager>().Deselect();
-                                swapflag = false;
-                            }
-                        }
+                        SwapFunctionality(space, card);
                     }
                     //Select/Deselect Space
                     else if (card != null)
@@ -180,10 +166,42 @@ public class PlayerTurnManager : MonoBehaviour {
     public void CancelActions()
     {
         swapflag = false;
-        SelectedSpace.setOutlineColor(0);
-        SelectedCard.setOutlineColor(0);
+        if (SelectedSpace != null)
+        {
+            SelectedSpace.setOutlineColor(0);
+        }
+        if (SelectedCard != null)
+        {
+            SelectedCard.setOutlineColor(0);
+        }
         SelectedSpace = null;
         SelectedCard = null;
         FindObjectOfType<buttonManager>().Deselect();
+    }
+
+    private void SwapFunctionality(BoardSpaceStruct space, ICard card)
+    {
+
+        //attempting to swap with empty space
+        if (card == null)
+        {
+            return;
+        }
+        //check for same space swap
+        if (SelectedSpace.x == space.x && SelectedSpace.y == space.y) { return; }
+
+        else
+        {
+            //Checks for valid swap
+            if (manager.gameModel.canSwap(SelectedSpace.x, SelectedSpace.y, space.x, space.y))
+            {
+                manager.gameModel.SwapCards(0, SelectedSpace.x, SelectedSpace.y, space.x, space.y);
+                manager.updateBoard();
+                SelectedSpace.setOutlineColor(0);
+                SelectedSpace = null;
+                FindObjectOfType<buttonManager>().Deselect();
+                swapflag = false;
+            }
+        }
     }
 }

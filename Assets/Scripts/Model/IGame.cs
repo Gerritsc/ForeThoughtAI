@@ -96,7 +96,34 @@ public interface IGame
 	/// <returns>The turn player's board.</returns>
 	string[][] getBoardAsString (IBoard board, bool playerOne);
 
+    /// <summary>
+    /// Gets all valid player moves for the given player.
+    /// </summary>
+    /// <param name="board">current board state</param>
+    /// <param name="playerOne">whose turn it is</param>
+    /// <returns></returns>
 	List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne);
 
 	bool isPlayerOneTurn();
+
+    /// <summary>
+    /// Checks if a given column is full of cards, indicating that it can be a claimed for a win
+    /// </summary>
+    /// <param name="columnnumber">the row to check, 0 indexed</param>
+    /// <returns>true if the column is full </returns>
+    bool isFullColumn(int columnnumber);
+
+    /// <summary>
+    /// Checks if a given column is full of cards, indicating that it 
+    /// </summary>
+    /// <param name="rownumber"></param>
+    /// <returns>true if the row is full</returns>
+    bool isFullRow(int rownumber);
+
+    /// <summary>
+    /// checks if a given diagonal is full of cards.
+    /// </summary>
+    /// <param name="diagonal"> True if the diagonal begins in the top left, false if it starts in top right</param>
+    /// <returns>true if the diagonal is full</returns>
+    bool isFullDiagonal(bool StartLeft);
 }
