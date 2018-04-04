@@ -113,7 +113,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!84 &32195155
+--- !u!84 &121503131
 RenderTexture:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -124,8 +124,8 @@ RenderTexture:
     Hash: 00000000000000000000000000000000
   m_ForcedFallbackFormat: 4
   m_DownscaleFallback: 0
-  m_Width: 1001
-  m_Height: 614
+  m_Width: 789
+  m_Height: 425
   m_AntiAliasing: 1
   m_DepthFormat: 1
   m_ColorFormat: 0
@@ -413,8 +413,8 @@ MonoBehaviour:
   sourceCamera: {fileID: 175679039}
   outlineCamera: {fileID: 961604764}
   outlineShaderMaterial: {fileID: 0}
-  renderTexture: {fileID: 307064598}
-  extraRenderTexture: {fileID: 32195155}
+  renderTexture: {fileID: 581300343}
+  extraRenderTexture: {fileID: 121503131}
 --- !u!114 &175679044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -534,7 +534,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!84 &307064598
+--- !u!84 &581300343
 RenderTexture:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -545,8 +545,8 @@ RenderTexture:
     Hash: 00000000000000000000000000000000
   m_ForcedFallbackFormat: 4
   m_DownscaleFallback: 0
-  m_Width: 1001
-  m_Height: 614
+  m_Width: 789
+  m_Height: 425
   m_AntiAliasing: 1
   m_DepthFormat: 1
   m_ColorFormat: 0
@@ -896,7 +896,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 0
   m_RenderingPath: 1
-  m_TargetTexture: {fileID: 307064598}
+  m_TargetTexture: {fileID: 581300343}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
@@ -1393,7 +1393,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1526625241}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 175679044}
+        m_MethodName: removeCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1526625241

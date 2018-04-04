@@ -69,11 +69,11 @@ public interface IGame
     /// <returns></returns>
     IDeck getDeck();
 
-	/// <summary>
-	/// Gets the hand.
-	/// </summary>
-	/// <returns>The hand.</returns>
-	List<ICard> getHand ();
+    /// <summary>
+    /// Gets the hand.
+    /// </summary>
+    /// <returns>The hand.</returns>
+    List<ICard> getHand ();
 
     /// <summary>
     /// Returns whether the 2 positions are a valid swappable positions.
@@ -87,14 +87,25 @@ public interface IGame
     /// <returns>true if the two positions can be swapped</returns>
     bool canSwap(int x1, int y1, int x2, int y2);
 
-	/// <summary>
-	/// Gets the string representation of the turn player's board.
-	/// "none" means the space is empty
-	/// "uk" means the space is not known
-	/// Known cards are in a "X of Y" format, where X is value and Y is Suit/Color
-	/// </summary>
-	/// <returns>The turn player's board.</returns>
-	string[][] getBoardAsString (IBoard board, bool playerOne);
+    /// <summary>
+    /// Returns whether the card at that position can be removed.
+    /// In order to be valid, it must not be a starting zone,
+    /// and the player must not have already removed a card
+    /// </summary>
+    /// <param name="player">player who's turn it is</param>
+    /// <param name="x">x pos of the space</param>
+    /// <param name="y">y pos of the space</param>
+    /// <returns>true if the two positions can be swapped</returns>
+    bool canRemove(int player, int x, int y);
+
+    /// <summary>
+    /// Gets the string representation of the turn player's board.
+    /// "none" means the space is empty
+    /// "uk" means the space is not known
+    /// Known cards are in a "X of Y" format, where X is value and Y is Suit/Color
+    /// </summary>
+    /// <returns>The turn player's board.</returns>
+    string[][] getBoardAsString (IBoard board, bool playerOne);
 
     /// <summary>
     /// Gets all valid player moves for the given player.
@@ -102,9 +113,9 @@ public interface IGame
     /// <param name="board">current board state</param>
     /// <param name="playerOne">whose turn it is</param>
     /// <returns></returns>
-	List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne);
+    List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne);
 
-	bool isPlayerOneTurn();
+    bool isPlayerOneTurn();
 
     /// <summary>
     /// Checks if a given column is full of cards, indicating that it can be a claimed for a win

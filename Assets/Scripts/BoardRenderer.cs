@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BoardRenderer : MonoBehaviour {
+public class BoardRenderer : MonoBehaviour 
+{
 
     readonly int ROWCOUNT = 5;
 
@@ -42,7 +43,8 @@ public class BoardRenderer : MonoBehaviour {
     }
 
     // Use this for initialization
-    public void initBoard () {
+    public void initBoard () 
+    {
         board = FindObjectOfType<ModelManager>().gameModel.getBoard();
         //background.transform.localScale = new Vector3(BOARDWIDTH, 0, BOARDWIDTH);
         boardobjects = new GameObject[ROWCOUNT, ROWCOUNT];
@@ -83,7 +85,7 @@ public class BoardRenderer : MonoBehaviour {
             }
 
         }
-	}
+    }
 
     public void UpdateBoard(IGame model)
     {
