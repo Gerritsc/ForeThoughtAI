@@ -16,7 +16,7 @@ public class PlayerTurnManager : MonoBehaviour {
     public event SpaceSelectAction onSpaceSelect;
     public event SpaceSelectAction onSpaceDeselect;
 
-    bool swapflag;
+    bool swapflag, removeflag;
 
     private void OnDisable()
     {
@@ -30,6 +30,7 @@ public class PlayerTurnManager : MonoBehaviour {
         SelectedSpace = null;
         SelectedCard = null;
         swapflag = false;
+		removeflag = false;
     }
 	
 	// Update is called once per frame
@@ -52,10 +53,10 @@ public class PlayerTurnManager : MonoBehaviour {
                     var space = hit.transform.GetComponent<BoardSpaceStruct>();
                     var card = space.getCard();
                     //Swap functionality
-                    if (swapflag && SelectedSpace != null)
-                    {
-                        SwapFunctionality(space, card);
-                    }
+					if (swapflag && SelectedSpace != null) 
+					{
+						SwapFunctionality (space, card);
+					}
                     //Select/Deselect Space
                     else if (card != null)
                     {
@@ -92,6 +93,15 @@ public class PlayerTurnManager : MonoBehaviour {
     {
         StartCoroutine("peekFunctionality", 2f);
     }
+
+	public void removeCard()
+	{
+		var spaceToRemove = SelectedSpace;
+		manager.gameModel.RemoveCard (0, spaceToRemove.x, spaceToRemove.y);
+		SelectedSpace.setOutlineColor(0);
+		manager.updateBoard();
+		FindObjectOfType<buttonManager> ().Deselect ();
+	}
 
     //flips a face down card, displaying its value
     IEnumerator peekFunctionality(float time)

@@ -48,12 +48,15 @@ public class buttonManager : MonoBehaviour {
         peekButton.SetActive(false);
         swapButton.SetActive(true);
 
+		if (model.canRemove (0, space.x, space.y)) 
+		{
+			removeButton.SetActive (true);
+		}
+
         if (!space.isFaceup())
         {
             peekButton.SetActive(true);
         }
-
-        
 
     }
 

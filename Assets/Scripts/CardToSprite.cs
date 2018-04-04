@@ -19,7 +19,7 @@ public class CardToSprite : MonoBehaviour {
 
     public Sprite getSprite(ICard card)
     {
-        Debug.Log(card.getFullCard());
+        //Debug.Log(card.getFullCard());
         string suit = card.getSuitorColor();
         int val = card.GetCardNumValue() -2;
         int arrval = 0;
