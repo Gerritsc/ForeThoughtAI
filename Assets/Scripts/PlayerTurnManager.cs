@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTurnManager : MonoBehaviour 
+public class PlayerTurnManager : MonoBehaviour
 {
 
     [SerializeField]

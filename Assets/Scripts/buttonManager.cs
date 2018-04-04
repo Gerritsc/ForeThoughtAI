@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class buttonManager : MonoBehaviour 
+public class buttonManager : MonoBehaviour
 {
 
 
@@ -41,8 +41,8 @@ public class buttonManager : MonoBehaviour
 
     // Update is called once per frame
     void Update () {
-		
-	}
+        
+    }
 
     public void onSelect(BoardSpaceStruct space, IGame model)
     {

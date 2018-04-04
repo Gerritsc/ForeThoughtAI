@@ -85,13 +85,16 @@ public class Game : IGame
         try
         {
             this.board.addCard(x, y, card);
-			if (player == 0) {
-				this.player.Remove(card);
-				this.player.Add(deck.DrawCard());
-			} else {
-				this.AI.Remove(card);
-				this.AI.Add(deck.DrawCard());
-			}
+            if (player == 0)
+            {
+                this.player.Remove(card);
+                this.player.Add(deck.DrawCard());
+            }
+            else
+            {
+                this.AI.Remove(card);
+                this.AI.Add(deck.DrawCard());
+            }
 			
             switchTurn();
         }
