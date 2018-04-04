@@ -52,9 +52,9 @@ public class PlayerTurnManager : MonoBehaviour {
                     var space = hit.transform.GetComponent<BoardSpaceStruct>();
                     var card = space.getCard();
                     //Swap functionality
-                    if (swapflag && SelectedSpace != null) 
+                    if (swapflag && SelectedSpace != null)
                     {
-                        SwapFunctionality (space, card);
+                        SwapFunctionality(space, card);
                     }
                     //Select/Deselect Space
                     else if (card != null)

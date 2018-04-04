@@ -220,7 +220,8 @@ public class Game : IGame
         return !(removalmap [player] || ((x == 0 || x == max) && (y == 0 || y == max)));
     }
 
-	public string[][] getBoardAsString (IBoard board, bool playerOne){
+    public string[][] getBoardAsString (IBoard board, bool playerOne)
+    {
         int max = board.GetBoardDimensions ();
         string[][] boardString = new string[max][];
 

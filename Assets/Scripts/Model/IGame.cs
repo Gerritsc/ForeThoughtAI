@@ -87,15 +87,16 @@ public interface IGame
     /// <returns>true if the two positions can be swapped</returns>
     bool canSwap(int x1, int y1, int x2, int y2);
 
-	/// <summary>
-	/// Returns whether the card at that position can be removed.
-	/// In order to be valid, it must not be a starting zone and the player has not removed
-	/// </summary>
-	/// <param name="player">player who's turn it is</param>
-	/// <param name="x">x pos of the space</param>
-	/// <param name="y">y pos of the space</param>
-	/// <returns>true if the two positions can be swapped</returns>
-	bool canRemove(int player, int x, int y);
+    /// <summary>
+    /// Returns whether the card at that position can be removed.
+    /// In order to be valid, it must not be a starting zone,
+    /// and the player must not have already removed a card
+    /// </summary>
+    /// <param name="player">player who's turn it is</param>
+    /// <param name="x">x pos of the space</param>
+    /// <param name="y">y pos of the space</param>
+    /// <returns>true if the two positions can be swapped</returns>
+    bool canRemove(int player, int x, int y);
 
 	/// <summary>
 	/// Gets the string representation of the turn player's board.
