@@ -98,14 +98,14 @@ public interface IGame
     /// <returns>true if the two positions can be swapped</returns>
     bool canRemove(int player, int x, int y);
 
-	/// <summary>
-	/// Gets the string representation of the turn player's board.
-	/// "none" means the space is empty
-	/// "uk" means the space is not known
-	/// Known cards are in a "X of Y" format, where X is value and Y is Suit/Color
-	/// </summary>
-	/// <returns>The turn player's board.</returns>
-	string[][] getBoardAsString (IBoard board, bool playerOne);
+    /// <summary>
+    /// Gets the string representation of the turn player's board.
+    /// "none" means the space is empty
+    /// "uk" means the space is not known
+    /// Known cards are in a "X of Y" format, where X is value and Y is Suit/Color
+    /// </summary>
+    /// <returns>The turn player's board.</returns>
+    string[][] getBoardAsString (IBoard board, bool playerOne);
 
     /// <summary>
     /// Gets all valid player moves for the given player.
@@ -113,9 +113,9 @@ public interface IGame
     /// <param name="board">current board state</param>
     /// <param name="playerOne">whose turn it is</param>
     /// <returns></returns>
-	List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne);
+    List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne);
 
-	bool isPlayerOneTurn();
+    bool isPlayerOneTurn();
 
     /// <summary>
     /// Checks if a given column is full of cards, indicating that it can be a claimed for a win
