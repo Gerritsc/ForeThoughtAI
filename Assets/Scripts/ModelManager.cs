@@ -41,6 +41,9 @@ public class ModelManager : MonoBehaviour
                     //Switch from enemy turn to PlayerPlay
                     currentstate = GameState.PlayerPlay;
                     FindObjectOfType<PlayerTurnManager>().enabled = true;
+
+                    gameModel.switchTurn();
+
                     break;
 
                 }
@@ -59,6 +62,8 @@ public class ModelManager : MonoBehaviour
                     currentstate = GameState.EnemyTurn;
                     FindObjectOfType<ClaimManager>().enabled = false;
                     FindObjectOfType<ClaimGameRenderer>().disableClaims();
+                    FindObjectOfType<EnemyTurnMaker>().takeTurn();
+                    gameModel.switchTurn();
                     break;
                 }
         }
@@ -70,6 +75,11 @@ public class ModelManager : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space))
         {
             switchState();
+        }
+        else if (Input.GetKeyUp(KeyCode.Alpha1))
+        {
+            var list = gameModel.getAllPlayerMoves(gameModel.getBoard(),true);
+            Debug.Log(list);
         }
     }
 
@@ -124,6 +134,8 @@ public class ModelManager : MonoBehaviour
         FindObjectOfType<ClaimGameRenderer>().disableClaims();
 
         changeDisplayText();
+        //gameModel = gameModel.RestartGame();
+        //OnBoardChange(gameModel);
 
     }
 }

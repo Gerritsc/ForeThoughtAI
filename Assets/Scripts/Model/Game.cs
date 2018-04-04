@@ -12,7 +12,7 @@ public class Game : IGame
     public IDeck deck;
     public IBoard board { get; set; }
 
-	public List<ICard> player, AI;
+    public List<ICard> player1hand, player2hand;
 
     //Map keeping track of player's ability to remove from the board, holds true if they can remove
     public Dictionary<int, bool> removalmap;
@@ -38,13 +38,13 @@ public class Game : IGame
         }
         board = new GameBoard(startingcards);
 
-		player = new List<ICard> ();
-		AI = new List<ICard> ();
-		for (int i = 0; i < 5; i++) 
-		{
-			player.Add (deck.DrawCard());
-			AI.Add (deck.DrawCard());
-		}
+        player1hand = new List<ICard>();
+        player2hand = new List<ICard>();
+        for (int i = 0; i < 5; i++)
+        {
+            player1hand.Add(deck.DrawCard());
+            player2hand.Add(deck.DrawCard());
+        }
     }
 
 
@@ -85,17 +85,20 @@ public class Game : IGame
         try
         {
             this.board.addCard(x, y, card);
-			if (player == 0) {
-				this.player.Remove(card);
-				this.player.Add(deck.DrawCard());
-			} else {
-				this.AI.Remove(card);
-				this.AI.Add(deck.DrawCard());
-			}
-			
+            if (player == 0)
+            {
+                this.player1hand.Remove(card);
+                this.player1hand.Add(deck.DrawCard());
+            }
+            else
+            {
+                this.player2hand.Remove(card);
+                this.player2hand.Add(deck.DrawCard());
+            }
+
             switchTurn();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
 
         }
@@ -120,7 +123,7 @@ public class Game : IGame
             case HANDTYPE.STRAIGHT:
                 {
                     sortbyValue(cardset);
-                    int[] values = (from i in cardset select i.GetCardNumValue()).ToArray() ;
+                    int[] values = (from i in cardset select i.GetCardNumValue()).ToArray();
 
                     //manual check for A2345 straight
                     if (cardset.Last().GetCardNumValue() == 14 && cardset.First().GetCardNumValue() == 2)
@@ -134,7 +137,7 @@ public class Game : IGame
             case HANDTYPE.FLUSH:
                 {
                     string suit = cardset.First().getSuitorColor();
-                    foreach(ICard i in cardset)
+                    foreach (ICard i in cardset)
                     {
                         if (i.getSuitorColor() != suit)
                         {
@@ -144,7 +147,7 @@ public class Game : IGame
                     return true;
                 }
             case HANDTYPE.FULLHOUSE:
-                { 
+                {
                     int[] values = (from i in cardset select i.GetCardNumValue()).ToArray();
                     Array.Sort(values);
                     return (values[0] == values[1] && values[3] == values[4] && (values[2] == values[1] || values[2] == values[3]));
@@ -168,13 +171,14 @@ public class Game : IGame
 
     public void RemoveCard(int player, int x, int y)
     {
+        
         var maxlen = board.GetBoardDimensions() - 1;
         //Check if the given coordinates are the board corners
-        if((x == 0  && y == 0)  || 
-           (x == 0 && y == maxlen)  ||
-           (x == maxlen && y == 0)  ||
-           (x == maxlen & y == maxlen)  ||
-           (x == (maxlen/2) && y == (maxlen/2)))
+        if ((x == 0 && y == 0) ||
+           (x == 0 && y == maxlen) ||
+           (x == maxlen && y == 0) ||
+           (x == maxlen & y == maxlen) ||
+           (x == (maxlen / 2) && y == (maxlen / 2)))
         {
             throw new ArgumentException("You cannot remove a corner card");
         }
@@ -196,7 +200,7 @@ public class Game : IGame
 
     public List<ICard> getHand()
     {
-        return this.player;
+        return this.player1hand;
     }
 
     public bool canSwap(int x1, int y1, int x2, int y2)
@@ -204,17 +208,69 @@ public class Game : IGame
         return board.canSwap(x1, y1, x2, y2);
     }
 
-	public string[][] getBoardAsString (IBoard board, bool playerOne){
-		return null;
-	}
+    public string[][] getBoardAsString(IBoard board, bool playerOne)
+    {
+        return null;
+    }
 
-	public List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne){
-		return null;
-	}
+    public List<GameMove> getAllPlayerMoves(IBoard board, bool playerOne)
+    {
+        List<GameMove> retList = new List<GameMove>();
+        List<ICard> hand;
+        if (playerOne)
+        {
+            hand = this.player1hand;
+        }
+        else
+        {
+            hand = this.player2hand;
+        }
 
-	public bool isPlayerOneTurn(){
-		return (playerturn == 0);
-	}
+
+        for (int x = 0; x < board.GetBoardDimensions(); x++)
+        {
+            for (int y = 0; y < board.GetBoardDimensions(); y++)
+            {
+                //Play Card Moves
+
+                //if empty space
+                if (board.GetCardAtSpace(x, y) == null)
+                {
+                    foreach (var card in hand)
+                    {
+                        retList.Add(new GameMove(x, y, card));
+                    }
+                    bool canremove;
+                    removalmap.TryGetValue(playerturn, out canremove);
+                    if (canremove)
+                    {
+                        //Remove
+                        var maxlen = board.GetBoardDimensions() - 1;
+                        //Check if the given coordinates are the board corners
+                        if (!((x == 0 && y == 0) ||
+                           (x == 0 && y == maxlen) ||
+                           (x == maxlen && y == 0) ||
+                           (x == maxlen & y == maxlen) ||
+                           (x == (maxlen / 2) && y == (maxlen / 2))))
+                        {
+                            retList.Add(new GameMove(x, y, false));
+                        }
+                    }
+
+                    //Swap Cards
+                }
+            }
+        }
+
+        //Swap Card Moves
+
+        return retList;
+    }
+
+    public bool isPlayerOneTurn()
+    {
+        return (playerturn == 0);
+    }
 
     public bool isFullColumn(int columnnumber)
     {
