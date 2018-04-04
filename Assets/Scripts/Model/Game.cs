@@ -131,16 +131,16 @@ public class Game : IGame
                         return (values[1] == 2 && values[2] == 3 && values[3] == 4 && values[4] == 5);
                     }
 
-					Array.Sort (values);
-					for (int i = 1; i < values.Length; i++) 
+				Array.Sort (values);
+				for (int i = 1; i < values.Length; i++) 
+				{
+					if (values [i] - 1 != values [i - 1]) 
 					{
-						if (values [i] - 1 != values [i - 1]) 
-						{
-							return false;
-						}
+						return false;
 					}
+				}
 
-					return true;
+				return true;
 
                     break;
                 }
