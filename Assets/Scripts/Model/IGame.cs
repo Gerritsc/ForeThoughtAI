@@ -69,11 +69,11 @@ public interface IGame
     /// <returns></returns>
     IDeck getDeck();
 
-	/// <summary>
-	/// Gets the hand.
-	/// </summary>
-	/// <returns>The hand.</returns>
-	List<ICard> getHand ();
+    /// <summary>
+    /// Gets the hand.
+    /// </summary>
+    /// <returns>The hand.</returns>
+    List<ICard> getHand ();
 
     /// <summary>
     /// Returns whether the 2 positions are a valid swappable positions.

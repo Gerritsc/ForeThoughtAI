@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerTurnManager : MonoBehaviour {
+public class PlayerTurnManager : MonoBehaviour 
+{
 
     [SerializeField]
     HandCardStruct SelectedCard;
@@ -25,7 +26,8 @@ public class PlayerTurnManager : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Awake () {
+    void Awake () 
+    {
         manager = FindObjectOfType<ModelManager>();
         SelectedSpace = null;
         SelectedCard = null;
@@ -33,7 +35,8 @@ public class PlayerTurnManager : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+    void Update () 
+    {
 
         //Deselect/Cancel all actions
         if (Input.GetKeyDown(KeyCode.Escape))

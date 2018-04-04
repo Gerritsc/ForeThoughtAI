@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HandRender : MonoBehaviour {
+public class HandRender : MonoBehaviour 
+{
 
 	[SerializeField]
 	float X_OFFSET;

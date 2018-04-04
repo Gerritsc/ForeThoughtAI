@@ -12,7 +12,7 @@ public class Game : IGame
     public IDeck deck;
     public IBoard board { get; set; }
 
-	public List<ICard> player, AI;
+    public List<ICard> player, AI;
 
     //Map keeping track of player's ability to remove from the board, holds true if they can remove
     public Dictionary<int, bool> removalmap;
@@ -38,13 +38,13 @@ public class Game : IGame
         }
         board = new GameBoard(startingcards);
 
-		player = new List<ICard> ();
-		AI = new List<ICard> ();
-		for (int i = 0; i < 5; i++) 
-		{
-			player.Add (deck.DrawCard());
-			AI.Add (deck.DrawCard());
-		}
+        player = new List<ICard> ();
+        AI = new List<ICard> ();
+        for (int i = 0; i < 5; i++) 
+        {
+            player.Add (deck.DrawCard());
+            AI.Add (deck.DrawCard());
+        }
     }
 
 
@@ -184,7 +184,8 @@ public class Game : IGame
             throw new ArgumentException("You cannot remove a card in a starting zone");
         }
 
-        if (removalmap[player]) {
+        if (removalmap[player])
+        {
             throw new ArgumentException ("You can only remove one card per game");
         }
 
@@ -230,7 +231,8 @@ public class Game : IGame
             boardString [x] = new string[max];
             for (int y = 0; y < max; y++) 
             {
-                if ((x + y) % 2 == 1) {
+                if ((x + y) % 2 == 1)
+                {
                     boardString [x] [y] = "uk";
                 } 
                 else 
@@ -250,13 +252,15 @@ public class Game : IGame
         return boardString;
     }
 
-	public List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne){
-		return null;
-	}
+    public List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne)
+    {
+        return null;
+    }
 
-	public bool isPlayerOneTurn(){
-		return (playerturn == 0);
-	}
+    public bool isPlayerOneTurn()
+    {
+        return (playerturn == 0);
+    }
 
     public bool isFullColumn(int columnnumber)
     {

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BoardRenderer : MonoBehaviour {
+public class BoardRenderer : MonoBehaviour 
+{
 
     readonly int ROWCOUNT = 5;
 

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CardToSprite : MonoBehaviour {
+public class CardToSprite : MonoBehaviour 
+{
 
     public Sprite[] cards;
 

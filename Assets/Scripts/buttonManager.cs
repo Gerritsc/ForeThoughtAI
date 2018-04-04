@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class buttonManager : MonoBehaviour {
+public class buttonManager : MonoBehaviour 
+{
 
 
 
