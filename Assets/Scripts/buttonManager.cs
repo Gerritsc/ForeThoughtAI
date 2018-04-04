@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class buttonManager : MonoBehaviour {
+public class buttonManager : MonoBehaviour
+{
 
 
 
@@ -40,20 +41,23 @@ public class buttonManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-		
-	}
+        
+    }
 
     public void onSelect(BoardSpaceStruct space, IGame model)
     {
         peekButton.SetActive(false);
         swapButton.SetActive(true);
 
+        if (model.canRemove (0, space.x, space.y)) 
+        {
+            removeButton.SetActive (true);
+        }
+
         if (!space.isFaceup())
         {
             peekButton.SetActive(true);
         }
-
-        
 
     }
 

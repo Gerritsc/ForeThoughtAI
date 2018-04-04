@@ -28,8 +28,8 @@ public class Game : IGame
         deck.ShuffleDeck();
         playerturn = 0;
         removalmap = new Dictionary<int, bool>();
-        removalmap.Add(0, true);
-        removalmap.Add(1, true);
+        removalmap.Add(0, false);
+        removalmap.Add(1, false);
 
         var startingcards = new ICard[5];
         for (int i = 0; i < 5; i++)
@@ -130,9 +130,17 @@ public class Game : IGame
                     {
                         return (values[1] == 2 && values[2] == 3 && values[3] == 4 && values[4] == 5);
                     }
-
-
-                    break;
+					
+                    Array.Sort (values);
+                    for (int i = 1; i < values.Length; i++) 
+                    {
+                        if (values [i] - 1 != values [i - 1]) 
+                        {
+                            return false;
+                        }
+                    }
+					
+                    return true;
                 }
             case HANDTYPE.FLUSH:
                 {
@@ -174,18 +182,21 @@ public class Game : IGame
         
         var maxlen = board.GetBoardDimensions() - 1;
         //Check if the given coordinates are the board corners
-        if ((x == 0 && y == 0) ||
-           (x == 0 && y == maxlen) ||
-           (x == maxlen && y == 0) ||
-           (x == maxlen & y == maxlen) ||
-           (x == (maxlen / 2) && y == (maxlen / 2)))
+        if(((x == 0 || x == maxlen) && (y == 0 || y == maxlen)) ||
+           (x == (maxlen/2) && y == (maxlen/2)))
         {
-            throw new ArgumentException("You cannot remove a corner card");
+            throw new ArgumentException("You cannot remove a card in a starting zone");
+        }
+
+        if (removalmap[player])
+        {
+            throw new ArgumentException ("You can only remove one card per game");
         }
 
         try
         {
             board.removeCard(x, y);
+            removalmap[player] = true;
         }
         catch (Exception e)
         {
@@ -206,11 +217,6 @@ public class Game : IGame
     public bool canSwap(int x1, int y1, int x2, int y2)
     {
         return board.canSwap(x1, y1, x2, y2);
-    }
-
-    public string[][] getBoardAsString(IBoard board, bool playerOne)
-    {
-        return null;
     }
 
     public List<GameMove> getAllPlayerMoves(IBoard board, bool playerOne)
@@ -265,6 +271,42 @@ public class Game : IGame
         //Swap Card Moves
 
         return retList;
+    }
+    public bool canRemove(int player, int x, int y)
+    {
+        int max = board.GetBoardDimensions () - 1;
+        return !(removalmap [player] || ((x == 0 || x == max) && (y == 0 || y == max)));
+    }
+
+    public string[][] getBoardAsString (IBoard board, bool playerOne)
+    {
+        int max = board.GetBoardDimensions ();
+        string[][] boardString = new string[max][];
+
+        for (int x = 0; x < max; x++)
+        {
+            boardString [x] = new string[max];
+            for (int y = 0; y < max; y++) 
+            {
+                if ((x + y) % 2 == 1)
+                {
+                    boardString [x] [y] = "uk";
+                } 
+                else 
+                {
+                    ICard card = board.GetCardAtSpace (x, y);
+                    if (card == null) 
+                    {
+                        boardString [x] [y] = "none";
+                    } 
+                    else 
+                    {
+                        boardString [x] [y] = card.getFullCard ();
+                    }
+                }
+            }
+        }
+        return boardString;
     }
 
     public bool isPlayerOneTurn()
