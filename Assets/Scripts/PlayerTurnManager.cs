@@ -72,6 +72,7 @@ public class PlayerTurnManager : MonoBehaviour
                         SelectedCard.setOutlineColor(0);
                         SelectedCard = null;
                         manager.updateBoard();
+                        manager.switchState();
                     }
                 }
                 //Select/Deselect card in hand
@@ -94,6 +95,7 @@ public class PlayerTurnManager : MonoBehaviour
     public void StartPeek()
     {
         StartCoroutine("peekFunctionality", 2f);
+        manager.switchState();
     }
 
     public void removeCard()
@@ -103,6 +105,7 @@ public class PlayerTurnManager : MonoBehaviour
         SelectedSpace.setOutlineColor(0);
         manager.updateBoard();
         FindObjectOfType<buttonManager> ().Deselect ();
+        manager.switchState();
     }
 
     //flips a face down card, displaying its value
@@ -113,7 +116,6 @@ public class PlayerTurnManager : MonoBehaviour
         yield return new WaitForSeconds(time);
 
         spaceToPeek.flipBackDown();
-
     }
 
     public void SelectHandFunctionality(HandCardStruct cardspace)
@@ -213,6 +215,7 @@ public class PlayerTurnManager : MonoBehaviour
                 SelectedSpace = null;
                 FindObjectOfType<buttonManager>().Deselect();
                 swapflag = false;
+                manager.switchState();
             }
         }
     }
