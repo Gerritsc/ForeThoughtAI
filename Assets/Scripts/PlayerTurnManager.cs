@@ -95,6 +95,7 @@ public class PlayerTurnManager : MonoBehaviour
     public void StartPeek()
     {
         StartCoroutine("peekFunctionality", 2f);
+        manager.gameModel.addPeekToKnown(SelectedSpace.x, SelectedSpace.y);
         manager.switchState();
     }
 

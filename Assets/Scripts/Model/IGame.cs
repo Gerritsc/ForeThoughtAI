@@ -137,4 +137,6 @@ public interface IGame
     /// <param name="diagonal"> True if the diagonal begins in the top left, false if it starts in top right</param>
     /// <returns>true if the diagonal is full</returns>
     bool isFullDiagonal(bool StartLeft);
+
+    void addPeekToKnown(int x, int y);
 }
