@@ -52,12 +52,12 @@ public class Game : IGame
         int max = board.GetBoardDimensions();
         player1KnownCards = new bool[max][];
         player2KnownCards = new bool[max][];
-        for (int x = 0; i < max; i++) {
+        for (int x = 0; x < max; x++) {
             player1KnownCards[x] = new bool[max];
             player2KnownCards[x] = new bool[max];
             for (int y = 0; y < max; y++) {
                 if (((x == 0 || x == max - 1) && (y == 0 || y == max - 1)) ||
-                    (x == (maxlen / 2) && y == (maxlen / 2))) 
+                    (x == (max / 2) && y == (max / 2))) 
                 {
                     player1KnownCards[x][y] = true;
                     player2KnownCards[x][y] = true;
@@ -97,11 +97,11 @@ public class Game : IGame
             board.swapCards(x1, y1, x2, y2);
             
             bool temp;
-            temp = player1KnownCards[x][y];
+            temp = player1KnownCards[x1][y1];
             player1KnownCards[x1][y1] = player1KnownCards[x2][y2];
             player1KnownCards[x2][y2] = temp;
 
-            temp = player2KnownCards[x][y];
+            temp = player2KnownCards[x1][y1];
             player2KnownCards[x1][y1] = player2KnownCards[x2][y2];
             player2KnownCards[x2][y2] = temp;
 
@@ -312,7 +312,7 @@ public class Game : IGame
             }
 
             curY += 2;
-            if (curY > board.GetBoardDimensions) {
+            if (curY > board.GetBoardDimensions()) {
                 curX++;
                 if (curX % 2 == 0) {
                     curY = 0;
