@@ -32,7 +32,7 @@ public class EnemyTurnMaker : MonoBehaviour {
             case MoveType.SWAP:
                 {
                     model.gameModel.SwapCards(1, playToMake.x1, playToMake.y1, playToMake.x2, playToMake.y2);
-                    StartCoroutine(DisplaySwapped(playToMake, 1.5f));
+                    StartCoroutine(DisplaySwapped(playToMake, 2.5f));
                     break;
                 }
             case MoveType.REMOVE:
@@ -53,7 +53,7 @@ public class EnemyTurnMaker : MonoBehaviour {
 
     private IEnumerator DisplaySwapped(GameMove g, float time)
     {
-        DisplayText.enabled = false;
+        DisplayText.enabled = true;
 
 
         //get spaces that were swapped
