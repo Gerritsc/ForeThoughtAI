@@ -62,8 +62,8 @@ public class ModelManager : MonoBehaviour
                     currentstate = GameState.EnemyTurn;
                     FindObjectOfType<ClaimManager>().enabled = false;
                     FindObjectOfType<ClaimGameRenderer>().disableClaims();
-                    FindObjectOfType<EnemyTurnMaker>().takeTurn();
                     gameModel.switchTurn();
+                    FindObjectOfType<EnemyTurnMaker>().takeTurn();
                     break;
                 }
         }

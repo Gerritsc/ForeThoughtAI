@@ -14,6 +14,9 @@ public class Game : IGame
 
     public List<ICard> player1hand, player2hand;
 
+
+    public bool[][] player1KnownCards, player2KnownCards;
+
     //Map keeping track of player's ability to remove from the board, holds true if they can remove
     public Dictionary<int, bool> removalmap;
 
@@ -28,8 +31,8 @@ public class Game : IGame
         deck.ShuffleDeck();
         playerturn = 0;
         removalmap = new Dictionary<int, bool>();
-        removalmap.Add(0, false);
-        removalmap.Add(1, false);
+        removalmap.Add(0, true);
+        removalmap.Add(1, true);
 
         var startingcards = new ICard[5];
         for (int i = 0; i < 5; i++)
@@ -45,6 +48,25 @@ public class Game : IGame
             player1hand.Add(deck.DrawCard());
             player2hand.Add(deck.DrawCard());
         }
+
+        int max = board.GetBoardDimensions();
+        player1KnownCards = new bool[max][];
+        player2KnownCards = new bool[max][];
+        for (int x = 0; x < max; x++) {
+            player1KnownCards[x] = new bool[max];
+            player2KnownCards[x] = new bool[max];
+            for (int y = 0; y < max; y++) {
+                if (isStartingZone(x, y)) 
+                {
+                    player1KnownCards[x][y] = true;
+                    player2KnownCards[x][y] = true;
+                }
+                else {
+                    player1KnownCards[x][y] = false;
+                    player2KnownCards[x][y] = false;
+                }
+            }
+        }
     }
 
 
@@ -53,16 +75,14 @@ public class Game : IGame
         return new Game();
     }
 
-    public void switchTurn()
+    public void switchTurn ()
     {
         //Switch to player2's turn
-        if (playerturn == 0)
-        {
+        if (playerturn == 0) {
             playerturn = 1;
         }
         //switch to player1's turn
-        else
-        {
+        else {
             playerturn = 0;
         }
     }
@@ -72,6 +92,16 @@ public class Game : IGame
         try
         {
             board.swapCards(x1, y1, x2, y2);
+            
+            bool temp;
+            temp = player1KnownCards[x1][y1];
+            player1KnownCards[x1][y1] = player1KnownCards[x2][y2];
+            player1KnownCards[x2][y2] = temp;
+
+            temp = player2KnownCards[x1][y1];
+            player2KnownCards[x1][y1] = player2KnownCards[x2][y2];
+            player2KnownCards[x2][y2] = temp;
+
             switchTurn();
         }
         catch (Exception e)
@@ -89,13 +119,15 @@ public class Game : IGame
             {
                 this.player1hand.Remove(card);
                 this.player1hand.Add(deck.DrawCard());
+                this.player1KnownCards[x][y] = true;
             }
             else
             {
                 this.player2hand.Remove(card);
                 this.player2hand.Add(deck.DrawCard());
+                this.player2KnownCards[x][y] = true;
             }
-
+            
             switchTurn();
         }
         catch (Exception e)
@@ -182,21 +214,20 @@ public class Game : IGame
         
         var maxlen = board.GetBoardDimensions() - 1;
         //Check if the given coordinates are the board corners
-        if(((x == 0 || x == maxlen) && (y == 0 || y == maxlen)) ||
-           (x == (maxlen/2) && y == (maxlen/2)))
+        if (isStartingZone(x, y))
         {
-            throw new ArgumentException("You cannot remove a card in a starting zone");
+            Console.WriteLine("You cannot remove a card in a starting zone");
         }
 
         if (removalmap[player])
         {
-            throw new ArgumentException ("You can only remove one card per game");
+            Console.WriteLine("You can only remove one card per game");
         }
 
         try
         {
             board.removeCard(x, y);
-            removalmap[player] = true;
+            removalmap[player] = false;
         }
         catch (Exception e)
         {
@@ -219,64 +250,64 @@ public class Game : IGame
         return board.canSwap(x1, y1, x2, y2);
     }
 
-    public List<GameMove> getAllPlayerMoves(IBoard board, bool playerOne)
+    public List<GameMove> getAllPlayerMoves (IBoard board, bool playerOne)
     {
-        List<GameMove> retList = new List<GameMove>();
+        List<GameMove> retList = new List<GameMove> ();
         List<ICard> hand;
-        if (playerOne)
-        {
+        if (playerOne) {
             hand = this.player1hand;
-        }
-        else
-        {
+        } else {
             hand = this.player2hand;
         }
 
+        int max = board.GetBoardDimensions ();
+        for (int i = 0; i < max * max; i++) {
+            int x = i % max;
+            int y = i / max;
+            if (board.GetCardAtSpace (x, y) == null) {
+                //Play
+                foreach (var card in hand) {
+                    retList.Add (new GameMove (x, y, card));
+                }
+                continue;
+            }
 
-        for (int x = 0; x < board.GetBoardDimensions(); x++)
-        {
-            for (int y = 0; y < board.GetBoardDimensions(); y++)
-            {
-                //Play Card Moves
+            //Peek
+            if ((x + y) % 2 == 1) {
+                retList.Add(new GameMove(x, y, true));
+            }
 
-                //if empty space
-                if (board.GetCardAtSpace(x, y) == null)
-                {
-                    foreach (var card in hand)
-                    {
-                        retList.Add(new GameMove(x, y, card));
-                    }
-                    bool canremove;
-                    removalmap.TryGetValue(playerturn, out canremove);
-                    if (canremove)
-                    {
-                        //Remove
-                        var maxlen = board.GetBoardDimensions() - 1;
-                        //Check if the given coordinates are the board corners
-                        if (!((x == 0 && y == 0) ||
-                           (x == 0 && y == maxlen) ||
-                           (x == maxlen && y == 0) ||
-                           (x == maxlen & y == maxlen) ||
-                           (x == (maxlen / 2) && y == (maxlen / 2))))
-                        {
-                            retList.Add(new GameMove(x, y, false));
-                        }
-                    }
+            //Remove
+            if (canRemove(playerturn, x, y)) {
+                retList.Add (new GameMove (x, y, false));
+            }
 
-                    //Swap Cards
+            //Swap
+            for (int j = i + 1; j < max * max; j++) {
+                int a = j % max;
+                int b = j / max;
+
+                if (((x + y) % 2 == (a + b) % 2) && board.GetCardAtSpace (a, b) != null) {
+                    retList.Add(new GameMove(x, y, a, b));
                 }
             }
         }
 
-        //Swap Card Moves
-
         return retList;
     }
+
     public bool canRemove(int player, int x, int y)
     {
         int max = board.GetBoardDimensions () - 1;
-        return !(removalmap [player] || ((x == 0 || x == max) && (y == 0 || y == max)));
+        return (removalmap[player] && !isStartingZone(x, y));
     }
+
+    private bool isStartingZone(int x, int y) 
+    {
+        int max = board.GetBoardDimensions () - 1;
+        return ((x == 0 || x == max) && (y == 0 || y == max)) || (x == (max / 2) && y == (max / 2));
+    }
+
 
     public string[][] getBoardAsString (IBoard board, bool playerOne)
     {
@@ -288,21 +319,26 @@ public class Game : IGame
             boardString [x] = new string[max];
             for (int y = 0; y < max; y++) 
             {
-                if ((x + y) % 2 == 1)
+                ICard card = board.GetCardAtSpace (x, y);
+                if (card == null) 
                 {
-                    boardString [x] [y] = "uk";
+                    boardString [x] [y] = "none";
+                } 
+                else if ((x + y) % 2 == 1)
+                {
+                    if (playerOne && player1KnownCards[x][y]) {
+                        boardString[x][y] = card.getFullCard ();
+                    }
+                    else if (!playerOne && player2KnownCards[x][y]) {
+                        boardString[x][y] = card.getFullCard ();
+                    }
+                    else {
+                        boardString [x] [y] = "uk";
+                    }
                 } 
                 else 
                 {
-                    ICard card = board.GetCardAtSpace (x, y);
-                    if (card == null) 
-                    {
-                        boardString [x] [y] = "none";
-                    } 
-                    else 
-                    {
-                        boardString [x] [y] = card.getFullCard ();
-                    }
+                    boardString [x] [y] = card.getFullCard ();
                 }
             }
         }
@@ -328,4 +364,15 @@ public class Game : IGame
     {
         return board.isFullDiagonal(StartLeft);
     }
+
+    public void addPeekToKnown(int x, int y) 
+    {
+        if (isPlayerOneTurn()) {
+            player1KnownCards[x][y] = true;
+        }
+        else {
+            player2KnownCards[x][y] = true;
+        }
+
+    } 
 }
