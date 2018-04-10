@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEngine;
 
 public enum HANDTYPE { STRAIGHT, FULLHOUSE, FLUSH, FOURKIND }
 /// <summary>
@@ -32,8 +31,8 @@ public class Game : IGame
         deck.ShuffleDeck();
         playerturn = 0;
         removalmap = new Dictionary<int, bool>();
-        removalmap.Add(0, false);
-        removalmap.Add(1, false);
+        removalmap.Add(0, true);
+        removalmap.Add(1, true);
 
         var startingcards = new ICard[5];
         for (int i = 0; i < 5; i++)
@@ -57,8 +56,7 @@ public class Game : IGame
             player1KnownCards[x] = new bool[max];
             player2KnownCards[x] = new bool[max];
             for (int y = 0; y < max; y++) {
-                if (((x == 0 || x == max - 1) && (y == 0 || y == max - 1)) ||
-                    (x == (max / 2) && y == (max / 2))) 
+                if (isStartingZone(x, y)) 
                 {
                     player1KnownCards[x][y] = true;
                     player2KnownCards[x][y] = true;
@@ -87,9 +85,6 @@ public class Game : IGame
         else {
             playerturn = 0;
         }
-
-        Debug.Log(isPlayerOneTurn());
-        Debug.Log(getAllPlayerMoves(board, isPlayerOneTurn()).Count);
     }
 
     public void SwapCards(int player, int x1, int y1, int x2, int y2)
@@ -219,8 +214,7 @@ public class Game : IGame
         
         var maxlen = board.GetBoardDimensions() - 1;
         //Check if the given coordinates are the board corners
-        if (((x == 0 || x == maxlen) && (y == 0 || y == maxlen)) ||
-           (x == (maxlen/2) && y == (maxlen/2)))
+        if (isStartingZone(x, y))
         {
             Console.WriteLine("You cannot remove a card in a starting zone");
         }
@@ -233,7 +227,7 @@ public class Game : IGame
         try
         {
             board.removeCard(x, y);
-            removalmap[player] = true;
+            removalmap[player] = false;
         }
         catch (Exception e)
         {
@@ -266,44 +260,26 @@ public class Game : IGame
             hand = this.player2hand;
         }
 
-
-        for (int x = 0; x < board.GetBoardDimensions (); x++) {
-            for (int y = 0; y < board.GetBoardDimensions (); y++) {
-                //Play Card Moves
-
-                //if empty space
-                if (board.GetCardAtSpace (x, y) == null) {
-                    foreach (var card in hand) {
-                        //retList.Add (new GameMove (x, y, card));
-                    }
-                    //Swap Cards
-                }
-            }
-        }
-
-        //Swap Card Moves
-
         int max = board.GetBoardDimensions ();
         for (int i = 0; i < max * max; i++) {
             int x = i % max;
             int y = i / max;
             if (board.GetCardAtSpace (x, y) == null) {
+                //Play
+                foreach (var card in hand) {
+                    retList.Add (new GameMove (x, y, card));
+                }
                 continue;
             }
 
             //Peek
             if ((x + y) % 2 == 1) {
-                //retList.Add(new GameMove(x, y, true));
+                retList.Add(new GameMove(x, y, true));
             }
 
             //Remove
-            bool canremove = removalmap[playerturn];
-            if (canremove) {
-                //Check if the given coordinates are the board corners
-                if (!(((x == 0 || x == max - 1) && (y == 0 || y == max - 1)) ||
-                    (x == (max - 1 / 2) && y == (max - 1 / 2)))) {
-                    retList.Add (new GameMove (x, y, false));
-                }
+            if (canRemove(playerturn, x, y)) {
+                retList.Add (new GameMove (x, y, false));
             }
 
             //Swap
@@ -319,11 +295,19 @@ public class Game : IGame
 
         return retList;
     }
+
     public bool canRemove(int player, int x, int y)
     {
         int max = board.GetBoardDimensions () - 1;
-        return !(removalmap [player] || ((x == 0 || x == max) && (y == 0 || y == max)));
+        return (removalmap[player] && !isStartingZone(x, y));
     }
+
+    private bool isStartingZone(int x, int y) 
+    {
+        int max = board.GetBoardDimensions () - 1;
+        return ((x == 0 || x == max) && (y == 0 || y == max)) || (x == (max / 2) && y == (max / 2));
+    }
+
 
     public string[][] getBoardAsString (IBoard board, bool playerOne)
     {
