@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 
 public enum HANDTYPE { STRAIGHT, FULLHOUSE, FLUSH, FOURKIND }
 /// <summary>
@@ -86,6 +87,9 @@ public class Game : IGame
         else {
             playerturn = 0;
         }
+
+        Debug.Log(isPlayerOneTurn());
+        Debug.Log(getAllPlayerMoves(board, isPlayerOneTurn()).Count);
     }
 
     public void SwapCards(int player, int x1, int y1, int x2, int y2)
@@ -270,23 +274,8 @@ public class Game : IGame
                 //if empty space
                 if (board.GetCardAtSpace (x, y) == null) {
                     foreach (var card in hand) {
-                        retList.Add (new GameMove (x, y, card));
+                        //retList.Add (new GameMove (x, y, card));
                     }
-                    bool canremove;
-                    removalmap.TryGetValue (playerturn, out canremove);
-                    if (canremove) {
-                        //Remove
-                        var maxlen = board.GetBoardDimensions () - 1;
-                        //Check if the given coordinates are the board corners
-                        if (!((x == 0 && y == 0) ||
-                            (x == 0 && y == maxlen) ||
-                            (x == maxlen && y == 0) ||
-                            (x == maxlen & y == maxlen) ||
-                            (x == (maxlen / 2) && y == (maxlen / 2)))) {
-                            retList.Add (new GameMove (x, y, false));
-                        }
-                    }
-
                     //Swap Cards
                 }
             }
@@ -302,6 +291,22 @@ public class Game : IGame
                 continue;
             }
 
+            //Peek
+            if ((x + y) % 2 == 1) {
+                //retList.Add(new GameMove(x, y, true));
+            }
+
+            //Remove
+            bool canremove = removalmap[playerturn];
+            if (canremove) {
+                //Check if the given coordinates are the board corners
+                if (!(((x == 0 || x == max - 1) && (y == 0 || y == max - 1)) ||
+                    (x == (max - 1 / 2) && y == (max - 1 / 2)))) {
+                    retList.Add (new GameMove (x, y, false));
+                }
+            }
+
+            //Swap
             for (int j = i + 1; j < max * max; j++) {
                 int a = j % max;
                 int b = j / max;
