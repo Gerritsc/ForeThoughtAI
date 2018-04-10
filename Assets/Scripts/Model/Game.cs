@@ -333,7 +333,7 @@ public class Game : IGame
                 ICard card = board.GetCardAtSpace (x, y);
                 if (card == null) 
                 {
-                        boardString [x] [y] = "none";
+                    boardString [x] [y] = "none";
                 } 
                 else if ((x + y) % 2 == 1)
                 {
