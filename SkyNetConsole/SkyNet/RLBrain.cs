@@ -8,7 +8,7 @@ public class RLBrain {
 
 	private List<SkyNetNode> skyNetTreeRoots;
 
-	private int numPlaythroughs = 100;
+	private int numPlaythroughs = 1000;
 
 	private RLBrain(){
 		skyNetTreeRoots = new List<SkyNetNode> ();
@@ -40,12 +40,12 @@ public class RLBrain {
 
 	public void TrainOfThought(object stateInfo){
 		IGame game = new Game ();
-		MCTSkyNet squishyThought = new MCTSkyNet (game, game.isPlayerOneTurn ());
+		MCTSkyNet squishyThought = new MCTSkyNet (game, numPlaythroughs, 5.0f);
 		for (int i = 0; i < numPlaythroughs; i++) {
-			squishyThought.MCTSSingleIteration ();
+			squishyThought.MCTSSingleIteration (squishyThought.GetRoot());
 		}
 		SkyNetNode newRoot = squishyThought.GetRoot ();
-
+        updateRootList(newRoot);
 	}
 
 	private void updateRootList(SkyNetNode newRoot){

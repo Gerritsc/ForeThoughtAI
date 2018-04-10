@@ -67,82 +67,65 @@ public class SkyNetNode {
 
 public class MCTSkyNet {
 
-	Dictionary<string, List<SkyNetNode>> shortTermMemory;
 	SkyNetNode rootNode;
-
+    SkyNetNode curNode;
 	ZobristKiller hashAndSlasher;
 
-	string[][] localBString;
-	IGame localGame;
-	IBoard localBoard;
+	IGame curGame;
+    bool isPlayerOne;
 
-	public MCTSkyNet(IGame game, bool playerOne){
+    int numIters;
+    float maxWait;
+
+	public MCTSkyNet(IGame game, int numIters, float maxWait){
+        this.maxWait = maxWait;
+        this.numIters = numIters;
 		hashAndSlasher = ZobristKiller.GetTheKiller ();
-		shortTermMemory = new Dictionary<string, List<SkyNetNode>> ();
-		localBoard = game.getBoard ();
-		localBString = game.getBoardAsString (localBoard, playerOne);
-		rootNode = new SkyNetNode (hashAndSlasher.HashIt(localBString), playerOne);
+        isPlayerOne = game.isPlayerOneTurn();
+        String[][] localBString = curGame.getBoardAsString(curGame.getBoard(), isPlayerOne);
+		rootNode = new SkyNetNode (hashAndSlasher.HashIt(localBString), isPlayerOne);
+        curNode = rootNode;
 	}
 
-	public void MCTSSingleIteration()
+    public SkyNetNode pickOfficialMove()
+    {
+        IBoard localBoard = curGame.getBoard();
+        DateTime curTime = DateTime.UtcNow;
+        DateTime endTime = DateTime.UtcNow.AddSeconds(maxWait);
+        for (int i = 0; ((i < numIters) && (DateTime.Compare(curTime, endTime) <= 0)); i++)
+        {
+            MCTSSingleIteration(curNode);
+            curTime = DateTime.UtcNow;
+        }
+        SkyNetNode chosen = MCTSSelect(curNode);
+        curNode = chosen;
+        return chosen;
+    }
+
+	public void MCTSSingleIteration(SkyNetNode localRoot)
 	{
-		SkyNetNode curNode = rootNode;
-		while (curNode != null) {//while the node has children
-			curNode = MCTSSelect(curNode);
-		}
-		MCTSExpand (curNode);
-		SkyNetNode pickedChild = MCTSSelect (curNode);
-		bool playerOneWin = MCTSRandSimPlayout(pickedChild);
-		MCTSBackpropWin(pickedChild, playerOneWin);
+	    SkyNetNode curNode = localRoot;
+        while (curNode != null)
+        {//while the node has children
+            curNode = MCTSSelect(curNode);
+        }
+        MCTSExpand(curNode);
+        SkyNetNode pickedChild = MCTSSelect(curNode);
+        bool playerOneWin = MCTSRandSimPlayout(pickedChild);
+        MCTSBackpropWin(pickedChild, playerOneWin);
 	}
 
 	public SkyNetNode GetRoot(){
 		return rootNode;
 	}
 
-//	public void MCTS(int playerTurn, SkyNetNode prevNode){
-//		IBoard board = localGame.getBoard();
-//		int ind = 0;
-//		bool expanding = true;
-//		while(expanding){
-//
-//			string[][] bString = localGame.getBoardAsString (board, playerTurn);
-//			string bHash = hashAndSlasher.HashIt (bString);
-//
-//			List<GameMove> availMoves = localGame.getAllPlayerMoves (board, playerTurn);
-//
-//			if (!shortTermMemory.ContainsKey (bHash)) {
-//				shortTermMemory.Add (bHash, new List<SkyNetNode> ());
-//			}
-//
-//			List<SkyNetNode> movesInMem = shortTermMemory[bHash];
-//			GameMove selected = availMoves [ind];
-//			SkyNetNode selectAsNode = new SkyNetNode (selected, prevNode, playerTurn, false);
-//			int memInd = movesInMem.IndexOf (selectAsNode);
-//			if (memInd != -1) { // We've done this move from this state before
-//				selectAsNode = movesInMem[memInd];
-//				selectAsNode.prevNode = prevNode;
-//			} else {
-//				movesInMem.Add (selectAsNode);
-//			}
-//			selectAsNode.incVisit ();
-//
-//			board = mockMove (board, selectAsNode);
-//			if (!CheckTerminalNode (board)) {
-//				
-//			} else {
-//				expanding = false;
-//				backpropWin (selectAsNode);
-//			}
-//		}
-//	}
-
 	private void MCTSExpand(SkyNetNode curNode){
 		Console.WriteLine ("ENTERING MCTS EXPANSION");
 		bool playerOne = !curNode.playerOne;
-		List<GameMove> availMoves = localGame.getAllPlayerMoves (localBoard, playerOne);
+        IBoard localBoard = curGame.getBoard();
+		List<GameMove> availMoves = curGame.getAllPlayerMoves (localBoard, playerOne);
 		int cnt = availMoves.Count;
-		string hash = hashAndSlasher.HashIt(localGame.getBoardAsString (localBoard, playerOne));
+		string hash = hashAndSlasher.HashIt(curGame.getBoardAsString (localBoard, playerOne));
 		bool curBoardTerminal = CheckTerminalNode (localBoard);
 		if (cnt > 0 && !curBoardTerminal) {
 			curNode.children = new List<SkyNetNode>();
@@ -175,12 +158,12 @@ public class MCTSkyNet {
 
 	private bool MCTSRandSimPlayout(SkyNetNode curNode){
 		Console.WriteLine ("ENTERING MCTS SIM PLAYOUT");
-		IBoard tmpBoard = localBoard;
+		IBoard tmpBoard = curGame.getBoard().Copy();
 		bool curBoardTerminal = CheckTerminalNode (tmpBoard);
 		Random rand = new Random ();
 		bool playerOne = curNode.playerOne;
 		while(!curBoardTerminal){
-			List<GameMove> availMoves = localGame.getAllPlayerMoves (tmpBoard, playerOne);
+			List<GameMove> availMoves = curGame.getAllPlayerMoves (tmpBoard, playerOne);
 			int cnt = availMoves.Count;
 			int randMoveInd = rand.Next (0, availMoves.Count);
 			GameMove randMove = availMoves [randMoveInd];
@@ -221,26 +204,30 @@ public class MCTSkyNet {
 				toTestVert.Add (board.GetCardAtSpace(j, i));
 			}
 			foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE))) {
-				terminal = terminal && localGame.CheckGameOverClaim (toTestHoriz, t) && localGame.CheckGameOverClaim (toTestVert, t);
+				terminal = terminal && curGame.CheckGameOverClaim (toTestHoriz, t) && curGame.CheckGameOverClaim (toTestVert, t);
 			}
 		}
 		foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE))) {
-			terminal = terminal && localGame.CheckGameOverClaim (toTestDiag1, t) && localGame.CheckGameOverClaim (toTestDiag2, t);
+			terminal = terminal && curGame.CheckGameOverClaim (toTestDiag1, t) && curGame.CheckGameOverClaim (toTestDiag2, t);
 		}
 		return terminal;
 	}
 
 	private void makeMove(IBoard board, GameMove move){
+        int player = (curGame.isPlayerOneTurn()) ? 0 : 1;
 		switch (move.type) {
-		case MoveType.ADD:
-			board.addCard (move.x1, move.y1, move.card);
-			break;
-		case MoveType.REMOVE:
-			board.removeCard (move.x1, move.y1);
-			break;
-		case MoveType.SWAP:
-			board.swapCards (move.x1, move.y1, move.x2, move.y2);
-			break;
+		    case MoveType.ADD:
+			    board.addCard (move.x1, move.y1, move.card);
+			    break;
+		    case MoveType.REMOVE:
+                board.removeCard (move.x1, move.y1);
+			    break;
+		    case MoveType.SWAP:
+                board.swapCards (move.x1, move.y1, move.x2, move.y2);
+			    break;
+            case MoveType.PEEK:
+                //board.peek(move.x1, move.y1);
+                break;
 		}
 	}
 }

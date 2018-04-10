@@ -8,10 +8,12 @@ namespace SkyNetConsole
 {
     class Program
     {
+        static int numGames = 100;
+
         static void Main(string[] args)
         {
             RLBrain squishy = RLBrain.FindSquishy();
-            squishy.SelfTeach(100);
+            squishy.SelfTeach(numGames);
         }
     }
 }

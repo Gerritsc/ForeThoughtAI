@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
 class GameBoard : IBoard
 {
     static readonly int GRIDSIZE = 5;
@@ -214,5 +213,10 @@ class GameBoard : IBoard
             }
         }
         return numcards == GRIDSIZE;
+    }
+
+    IBoard Copy()
+    {
+        return (IBoard)this.MemberwiseClone();
     }
 }
