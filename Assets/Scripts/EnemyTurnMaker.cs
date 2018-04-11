@@ -21,7 +21,11 @@ public class EnemyTurnMaker : MonoBehaviour {
 
     public void takeTurn()
     {
-        var playToMake = model.gameModel.getAllPlayerMoves(model.gameModel.getBoard(),false)[0];
+        var playsToMake = model.gameModel.getAllPlayerMoves(model.gameModel.getBoard(),false);
+
+        int rand = Random.Range(0, playsToMake.Count - 1);
+
+        var playToMake = playsToMake[rand];
 
         switch (playToMake.type) {
             case MoveType.ADD:
