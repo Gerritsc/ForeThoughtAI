@@ -233,7 +233,7 @@ public class MCTSkyNet {
 	private void makeMove(IBoard board, GameMove move){
 		switch (move.type) {
 		case MoveType.ADD:
-			board.addCard (move.x1, move.y1, move.card);
+                board.addCard(localGame.getPlayerTurn(), move.x1, move.y1, move.card);
 			break;
 		case MoveType.REMOVE:
 			board.removeCard (move.x1, move.y1);

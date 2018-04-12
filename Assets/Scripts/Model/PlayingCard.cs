@@ -24,6 +24,14 @@ public class PlayingCard : ICard
         } 
     }
 
+    private PlayingCard(PlayingCard card)
+    {
+        var suit = card.suit;
+        this.suit = suit;
+        int value = card.value;
+        this.value = value;
+    }
+
     /// <summary>
     /// Create a new Playing Card
     /// </summary>
@@ -118,5 +126,10 @@ public class PlayingCard : ICard
             return 0;
         }
         else return -1;
+    }
+
+    public ICard CopyCard()
+    {
+        return new PlayingCard(this);
     }
 }

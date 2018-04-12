@@ -43,6 +43,19 @@ public class PlayingCardDeck : IDeck
         this.decksize = cards.Count;
     }
 
+    private PlayingCardDeck(PlayingCardDeck deck)
+    {
+        this.cards = new List<ICard>();
+
+        foreach (var card in deck.cards)
+        {
+            this.cards.Add(card.CopyCard());
+        }
+
+        this.decksize = this.cards.Count;
+
+    }
+
     public ICard DrawCard()
     {
         if (decksize > 0)
@@ -86,5 +99,10 @@ public class PlayingCardDeck : IDeck
     public List<ICard> getDeck()
     {
         return cards;
+    }
+
+    public IDeck CopyDeck()
+    {
+        return new PlayingCardDeck(this);
     }
 }

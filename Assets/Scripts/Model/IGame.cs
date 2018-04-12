@@ -139,4 +139,8 @@ public interface IGame
     bool isFullDiagonal(bool StartLeft);
 
     void addPeekToKnown(int x, int y);
+
+    IGame CopyGame();
+
+    int getPlayerTurn();
 }

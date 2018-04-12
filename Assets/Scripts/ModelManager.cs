@@ -74,7 +74,8 @@ public class ModelManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            switchState();
+            gameModel = gameModel.CopyGame();
+            OnBoardChange(gameModel);
         }
         else if (Input.GetKeyUp(KeyCode.Alpha1))
         {

@@ -14,9 +14,6 @@ public class Game : IGame
 
     public List<ICard> player1hand, player2hand;
 
-
-    public bool[][] player1KnownCards, player2KnownCards;
-
     //Map keeping track of player's ability to remove from the board, holds true if they can remove
     public Dictionary<int, bool> removalmap;
 
@@ -49,24 +46,36 @@ public class Game : IGame
             player2hand.Add(deck.DrawCard());
         }
 
-        int max = board.GetBoardDimensions();
-        player1KnownCards = new bool[max][];
-        player2KnownCards = new bool[max][];
-        for (int x = 0; x < max; x++) {
-            player1KnownCards[x] = new bool[max];
-            player2KnownCards[x] = new bool[max];
-            for (int y = 0; y < max; y++) {
-                if (isStartingZone(x, y)) 
-                {
-                    player1KnownCards[x][y] = true;
-                    player2KnownCards[x][y] = true;
-                }
-                else {
-                    player1KnownCards[x][y] = false;
-                    player2KnownCards[x][y] = false;
-                }
-            }
+        
+    }
+
+    private Game(Game game)
+    {
+        this.deck = game.deck.CopyDeck();
+        this.board = game.board.CopyBoard();
+
+        player1hand = new List<ICard>();
+        player2hand = new List<ICard>();
+
+        foreach (var card in game.player1hand)
+        {
+            player1hand.Add(card.CopyCard());
         }
+
+        foreach (var card in game.player2hand)
+        {
+            this.player2hand.Add(card.CopyCard());
+        }
+
+        removalmap = new Dictionary<int, bool>();
+        bool val;
+        removalmap.TryGetValue(0, out val);
+        removalmap.Add(0, val);
+        removalmap.TryGetValue(1, out val);
+        removalmap.Add(1, val);
+
+        this.playerturn = game.playerturn;
+
     }
 
 
@@ -92,15 +101,6 @@ public class Game : IGame
         try
         {
             board.swapCards(x1, y1, x2, y2);
-            
-            bool temp;
-            temp = player1KnownCards[x1][y1];
-            player1KnownCards[x1][y1] = player1KnownCards[x2][y2];
-            player1KnownCards[x2][y2] = temp;
-
-            temp = player2KnownCards[x1][y1];
-            player2KnownCards[x1][y1] = player2KnownCards[x2][y2];
-            player2KnownCards[x2][y2] = temp;
 
             switchTurn();
         }
@@ -114,18 +114,16 @@ public class Game : IGame
     {
         try
         {
-            this.board.addCard(x, y, card);
+            this.board.addCard(player,x, y, card);
             if (player == 0)
             {
                 this.player1hand.Remove(card);
                 this.player1hand.Add(deck.DrawCard());
-                this.player1KnownCards[x][y] = true;
             }
             else
             {
                 this.player2hand.Remove(card);
                 this.player2hand.Add(deck.DrawCard());
-                this.player2KnownCards[x][y] = true;
             }
             
             switchTurn();
@@ -311,38 +309,39 @@ public class Game : IGame
 
     public string[][] getBoardAsString (IBoard board, bool playerOne)
     {
-        int max = board.GetBoardDimensions ();
-        string[][] boardString = new string[max][];
+        return board.getBoardAsString(board, playerOne);
+        //int max = board.GetBoardDimensions ();
+        //string[][] boardString = new string[max][];
 
-        for (int x = 0; x < max; x++)
-        {
-            boardString [x] = new string[max];
-            for (int y = 0; y < max; y++) 
-            {
-                ICard card = board.GetCardAtSpace (x, y);
-                if (card == null) 
-                {
-                    boardString [x] [y] = "none";
-                } 
-                else if ((x + y) % 2 == 1)
-                {
-                    if (playerOne && player1KnownCards[x][y]) {
-                        boardString[x][y] = card.getFullCard ();
-                    }
-                    else if (!playerOne && player2KnownCards[x][y]) {
-                        boardString[x][y] = card.getFullCard ();
-                    }
-                    else {
-                        boardString [x] [y] = "uk";
-                    }
-                } 
-                else 
-                {
-                    boardString [x] [y] = card.getFullCard ();
-                }
-            }
-        }
-        return boardString;
+        //for (int x = 0; x < max; x++)
+        //{
+        //    boardString [x] = new string[max];
+        //    for (int y = 0; y < max; y++) 
+        //    {
+        //        ICard card = board.GetCardAtSpace (x, y);
+        //        if (card == null) 
+        //        {
+        //            boardString [x] [y] = "none";
+        //        } 
+        //        else if ((x + y) % 2 == 1)
+        //        {
+        //            if (playerOne && player1KnownCards[x][y]) {
+        //                boardString[x][y] = card.getFullCard ();
+        //            }
+        //            else if (!playerOne && player2KnownCards[x][y]) {
+        //                boardString[x][y] = card.getFullCard ();
+        //            }
+        //            else {
+        //                boardString [x] [y] = "uk";
+        //            }
+        //        } 
+        //        else 
+        //        {
+        //            boardString [x] [y] = card.getFullCard ();
+        //        }
+        //    }
+        //}
+        //return boardString;
     }
 
     public bool isPlayerOneTurn()
@@ -367,12 +366,16 @@ public class Game : IGame
 
     public void addPeekToKnown(int x, int y) 
     {
-        if (isPlayerOneTurn()) {
-            player1KnownCards[x][y] = true;
-        }
-        else {
-            player2KnownCards[x][y] = true;
-        }
+        board.Peek(this.playerturn, x, y);
+    }
 
-    } 
+    public IGame CopyGame()
+    {
+        return new Game(this);
+    }
+
+    public int getPlayerTurn()
+    {
+        return this.playerturn;
+    }
 }

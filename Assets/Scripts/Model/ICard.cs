@@ -44,4 +44,6 @@ public interface ICard
     /// <param name="card"></param>
     /// <returns>-1 if this card is less than, 0 if equal, 1 if this card is greater</returns>
     int compareValueTo(ICard card);
+
+    ICard CopyCard();
 }

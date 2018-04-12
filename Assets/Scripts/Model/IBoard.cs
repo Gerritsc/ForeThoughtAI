@@ -24,10 +24,11 @@ public interface IBoard
     /// Adds given card to the board, at the specified board location with X,Y coordinates.
     /// \n Will fail if the position is outside the board, or if there is a card already on the selected space.
     /// </summary>
+    /// <param name="player"> For purposes of AI's known cards</param>
     /// <param name="x">X position of the card to place</param>
     /// <param name="y">Y position of the card to place</param>
     /// <param name="card">Card to add</param>
-    void addCard(int x, int y, ICard card);
+    void addCard(int player, int x, int y, ICard card);
 
     /// <summary>
     /// Switches the cards at the two given coordinates on the board.  They MUST be of the same face up property, however.
@@ -78,4 +79,16 @@ public interface IBoard
     bool isFullRow(int rownum);
 
     bool isFullDiagonal(bool StartLeft);
+
+    IBoard CopyBoard();
+
+    /// <summary>
+    /// Gets the board as a string matrix through the player's lens.
+    /// </summary>
+    /// <param name="board"></param>
+    /// <param name="playerOne"></param>
+    /// <returns></returns>
+    string[][] getBoardAsString(IBoard board, bool playerOne);
+
+    void Peek(int player, int x, int y);
 }
