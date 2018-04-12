@@ -268,7 +268,7 @@ public class MCTSkyNet {
                 board.swapCards (move.x1, move.y1, move.x2, move.y2);
 			    break;
             case MoveType.PEEK:
-                //board.(move.x1, move.y1);
+                //board.peek(move.x1, move.y1);
                 break;
 		}
 	}

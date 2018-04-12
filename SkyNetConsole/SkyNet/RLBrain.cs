@@ -10,7 +10,7 @@ public class RLBrain {
 
 	private List<SkyNetNode> skyNetTreeRoots;
 
-	private int numPlayouts = 50;
+	private int numPlaythroughs = 1;
 
 	private RLBrain(){
 		skyNetTreeRoots = new List<SkyNetNode> ();

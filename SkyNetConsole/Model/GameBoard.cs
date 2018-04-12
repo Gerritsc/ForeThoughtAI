@@ -215,7 +215,7 @@ class GameBoard : IBoard
         return numcards == GRIDSIZE;
     }
 
-    public IBoard Copy()
+    public IBoard GetCopy()
     {
         return (IBoard)this.MemberwiseClone();
     }

@@ -1,0 +1,6 @@
+C:\Users\jack\ForeThoughtAI\SkyNetConsole\obj\x86\Debug\SkyNet.csprojResolveAssemblyReference.cache
+C:\Users\jack\ForeThoughtAI\SkyNetConsole\obj\x86\Debug\SkyNet.csproj.CoreCompileInputs.cache
+C:\Users\jack\ForeThoughtAI\SkyNetConsole\bin\Debug\ConsoleApplication.exe
+C:\Users\jack\ForeThoughtAI\SkyNetConsole\bin\Debug\ConsoleApplication.pdb
+C:\Users\jack\ForeThoughtAI\SkyNetConsole\obj\x86\Debug\ConsoleApplication.exe
+C:\Users\jack\ForeThoughtAI\SkyNetConsole\obj\x86\Debug\ConsoleApplication.pdb
