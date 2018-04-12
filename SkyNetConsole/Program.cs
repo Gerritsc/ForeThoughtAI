@@ -13,7 +13,8 @@ namespace SkyNetConsole
         static void Main(string[] args)
         {
             RLBrain squishy = RLBrain.FindSquishy();
-            squishy.SelfTeach(numGames);
+            //squishy.SelfTeach(numGames);
+            squishy.Test();
         }
     }
 }
