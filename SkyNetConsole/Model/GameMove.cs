@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 public enum MoveType { ADD = 0, SWAP, REMOVE, PEEK }
 
+[System.Serializable]
 public class GameMove
 {
     public int x1;
