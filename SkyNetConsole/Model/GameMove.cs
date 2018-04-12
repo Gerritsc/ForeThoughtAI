@@ -64,8 +64,11 @@ public class GameMove
                 case MoveType.ADD:
                     return (this.x1 == other.x1 && this.y1 == other.y1) && this.card.Equals(other.card);
                 case MoveType.SWAP:
-                    return this.x1 == other.x1 && this.y1 == other.y1 && this.x2 == other.x2 && this.y2 == other.y2;
+                    return (this.x1 == other.x1 && this.y1 == other.y1 && this.x2 == other.x2 && this.y2 == other.y2) ||
+                        (this.x1 == other.x2 && this.y1 == other.y2 && this.x2 == other.x1 && this.y2 == other.y1);
                 case MoveType.REMOVE:
+                    return this.x1 == other.x1 && this.y1 == other.y1;
+                case MoveType.PEEK:
                     return this.x1 == other.x1 && this.y1 == other.y1;
                 default:
                     return false;

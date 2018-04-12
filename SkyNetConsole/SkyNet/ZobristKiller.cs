@@ -20,11 +20,7 @@ public class ZobristKiller {
 
 	private ZobristKiller(){
 		if (!Load ()) {
-			allStrings = new List<string>(54);
-			boardHashConst = new string[boardWidth * boardHeight * allStrings.Count];
-			List<string> allStringCombs = new List<string> ();
-			allStrings[52] = "uk";
-			allStrings[53] = "none";
+			allStrings = new List<string>();
 			for (int i = 0; i < 4; i++) {
 				for (int j = 2; j <= 14; j++) {
 					//int ind = (i * 13) + (j - 2);
@@ -33,8 +29,13 @@ public class ZobristKiller {
 					allStrings.Add(desc);
 				}
 			}
+            allStrings.Add("uk");
+            allStrings.Add("none");
 
-			for (int i = 0; i < allStrings.Count; i++) {
+            boardHashConst = new string[boardWidth * boardHeight * allStrings.Count];
+            List<string> allStringCombs = new List<string>();
+
+            for (int i = 0; i < allStrings.Count; i++) {
 				for (int j = 0; j < boardWidth; j++) {
 					for (int k = 0; k < boardHeight; k++) {
 						int ind = boardPosToHashInd (j, k, allStrings [i]);

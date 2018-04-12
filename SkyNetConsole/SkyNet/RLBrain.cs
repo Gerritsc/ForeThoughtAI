@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 public class RLBrain {
@@ -8,7 +10,7 @@ public class RLBrain {
 
 	private List<SkyNetNode> skyNetTreeRoots;
 
-	private int numPlaythroughs = 100;
+	private int numPlayouts = 50;
 
 	private RLBrain(){
 		skyNetTreeRoots = new List<SkyNetNode> ();
@@ -40,12 +42,35 @@ public class RLBrain {
 
 	public void TrainOfThought(object stateInfo){
 		IGame game = new Game ();
-		MCTSkyNet squishyThought = new MCTSkyNet (game, game.isPlayerOneTurn ());
-		for (int i = 0; i < numPlaythroughs; i++) {
-			squishyThought.MCTSSingleIteration ();
-		}
+		MCTSkyNet squishyThought = new MCTSkyNet (game, numPlayouts, 5.0f);
+        bool curBoardTerminal = false;
+        while (!curBoardTerminal)
+        {
+            SkyNetNode turnMove = squishyThought.PickOfficialMove();
+            Debug.Assert(turnMove.playerOne == game.isPlayerOneTurn());
+            //String[][] bStringArr = game.getBoardAsString(game.getBoard(), game.isPlayerOneTurn());
+            //for (int i = 0; i < bStringArr.Length; i++)
+            //{
+            //    string toPrint = "";
+            //    for (int j = 0; j < bStringArr[i].Length; j++)
+            //    {
+            //        toPrint += bStringArr[i][j] + " ";
+            //    }
+            //    Console.WriteLine(toPrint);
+            //}
+            if (turnMove.isTerminal())
+            {
+                curBoardTerminal = true;
+                int winningPlayer = turnMove.playerOne ? 1 : 2;
+                //Console.WriteLine(String.Format("Game Ended. Player {0} wins", winningPlayer));
+            }
+            else
+            {
+                MakeMove(game, turnMove.move);
+            }
+        }
 		SkyNetNode newRoot = squishyThought.GetRoot ();
-
+        updateRootList(newRoot);
 	}
 
 	private void updateRootList(SkyNetNode newRoot){
@@ -61,10 +86,44 @@ public class RLBrain {
 		oldRoot.visitCnt += newRoot.visitCnt;
 		oldRoot.winCnt += newRoot.visitCnt;
 		foreach (SkyNetNode newchild in newRoot.children) {
-			if (oldRoot.children.Contains (newchild)) {
-
-			}
+            int existInd = oldRoot.children.IndexOf(newchild);
+			if (existInd != -1) {
+                MergeTrees(oldRoot.children[existInd], newchild);
+            } else {
+                Console.WriteLine("Child Node Error in Merge: NewRoot has child OldRoot does not.");
+            }
 		}
 	}
+
+
+
+    public void MakeMove(IGame game, GameMove move)
+    {
+        int playerInt = game.isPlayerOneTurn() ? 1 : 0;
+        switch (move.type)
+        {
+            case MoveType.ADD:
+                {
+                    game.PlayCard(playerInt, move.x1, move.y1, move.card);
+                    break;
+                }
+            case MoveType.SWAP:
+                {
+                    game.SwapCards(playerInt, move.x1, move.y1, move.x2, move.y2);
+                    break;
+                }
+            case MoveType.REMOVE:
+                {
+                    game.RemoveCard(playerInt, move.x1, move.y1);
+                    break;
+                }
+            case MoveType.PEEK:
+                {
+                    game.addPeekToKnown(move.x1, move.x2);
+                    break;
+                }
+        }
+        game.switchTurn();
+    }
 
 }
