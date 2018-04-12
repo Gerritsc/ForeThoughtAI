@@ -99,12 +99,12 @@ class GameBoard : IBoard
 
         if (firstSpace.isFaceUp() == secondSpace.isFaceUp())
         {
-            Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
+            //Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
 
             var tempcard = secondSpace.getCard();
             tempcard = firstSpace.swapCard(tempcard);
             tempcard = secondSpace.swapCard(tempcard);
-            Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
+            //Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
         }
         else
         {
@@ -215,7 +215,7 @@ class GameBoard : IBoard
         return numcards == GRIDSIZE;
     }
 
-    public IBoard GetCopy()
+    public IBoard Copy()
     {
         return (IBoard)this.MemberwiseClone();
     }

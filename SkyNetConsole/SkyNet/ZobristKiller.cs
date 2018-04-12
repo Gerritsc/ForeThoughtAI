@@ -25,12 +25,12 @@ public class ZobristKiller {
 				for (int j = 2; j <= 14; j++) {
 					//int ind = (i * 13) + (j - 2);
 					ICard tmpPC = new PlayingCard ((Suit)i, j);
-					string desc = tmpPC.getFullCard ();
+					string desc = tmpPC.getFullCard ().PadLeft(17);
 					allStrings.Add(desc);
 				}
 			}
-            allStrings.Add("uk");
-            allStrings.Add("none");
+            allStrings.Add("uk".PadLeft(17));
+            allStrings.Add("none".PadLeft(17));
 
             boardHashConst = new string[boardWidth * boardHeight * allStrings.Count];
             List<string> allStringCombs = new List<string>();

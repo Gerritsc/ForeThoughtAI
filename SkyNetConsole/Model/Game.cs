@@ -321,23 +321,23 @@ public class Game : IGame
                 ICard card = board.GetCardAtSpace (x, y);
                 if (card == null) 
                 {
-                    boardString [x] [y] = "none";
+                    boardString [x] [y] = "none".PadLeft(17);
                 } 
                 else if ((x + y) % 2 == 1)
                 {
                     if (playerOne && player1KnownCards[x][y]) {
-                        boardString[x][y] = card.getFullCard ();
+                        boardString[x][y] = card.getFullCard ().PadLeft(17);
                     }
                     else if (!playerOne && player2KnownCards[x][y]) {
-                        boardString[x][y] = card.getFullCard ();
+                        boardString[x][y] = card.getFullCard ().PadLeft(17);
                     }
                     else {
-                        boardString [x] [y] = "uk";
+                        boardString [x] [y] = "uk".PadLeft(17);
                     }
                 } 
                 else 
                 {
-                    boardString [x] [y] = card.getFullCard ();
+                    boardString [x] [y] = card.getFullCard ().PadLeft(17);
                 }
             }
         }

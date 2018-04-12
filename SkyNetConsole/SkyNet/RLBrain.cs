@@ -10,7 +10,7 @@ public class RLBrain {
 
 	private List<SkyNetNode> skyNetTreeRoots;
 
-	private int numPlaythroughs = 1;
+	private int numPlayouts = 1;
 
 	private RLBrain(){
 		skyNetTreeRoots = new List<SkyNetNode> ();
@@ -44,29 +44,33 @@ public class RLBrain {
 		IGame game = new Game ();
 		MCTSkyNet squishyThought = new MCTSkyNet (game, numPlayouts, 5.0f);
         bool curBoardTerminal = false;
-        while (!curBoardTerminal)
+        int moveCnt = 0;
+        while (!curBoardTerminal && moveCnt < 1000000)
         {
+            game.getBoard().PrintBoard();
             SkyNetNode turnMove = squishyThought.PickOfficialMove();
             Debug.Assert(turnMove.playerOne == game.isPlayerOneTurn());
-            //String[][] bStringArr = game.getBoardAsString(game.getBoard(), game.isPlayerOneTurn());
-            //for (int i = 0; i < bStringArr.Length; i++)
-            //{
+            // String[][] bStringArr = game.getBoardAsString(game.getBoard(), game.isPlayerOneTurn());
+            // for (int i = 0; i < bStringArr.Length; i++)
+            // {
             //    string toPrint = "";
             //    for (int j = 0; j < bStringArr[i].Length; j++)
             //    {
-            //        toPrint += bStringArr[i][j] + " ";
+            //        toPrint += bStringArr[i][j];
             //    }
             //    Console.WriteLine(toPrint);
-            //}
+            // }
             if (turnMove.isTerminal())
             {
                 curBoardTerminal = true;
                 int winningPlayer = turnMove.playerOne ? 1 : 2;
-                //Console.WriteLine(String.Format("Game Ended. Player {0} wins", winningPlayer));
+                Console.WriteLine(String.Format("Game Ended. Player {0} wins", winningPlayer));
             }
             else
             {
                 MakeMove(game, turnMove.move);
+                Console.WriteLine(String.Format("Move Made!\nPlayer One's: {0}\nMove:\n{1}\n", turnMove.playerOne.ToString(), turnMove.move.ToString()));
+                moveCnt++;
             }
         }
 		SkyNetNode newRoot = squishyThought.GetRoot ();
