@@ -69,9 +69,9 @@ public class Game : IGame
 
         removalmap = new Dictionary<int, bool>();
         bool val;
-        removalmap.TryGetValue(0, out val);
+        game.removalmap.TryGetValue(0, out val);
         removalmap.Add(0, val);
-        removalmap.TryGetValue(1, out val);
+        game.removalmap.TryGetValue(1, out val);
         removalmap.Add(1, val);
 
         this.playerturn = game.playerturn;
