@@ -29,4 +29,6 @@ public interface IDeck
     /// <returns></returns>
     ICard DrawCard();
 
+    IDeck CopyDeck();
+
 }

@@ -11,6 +11,7 @@ class GameBoard : IBoard
     /// </summary>
     BoardSpace[,] board;
 
+    public bool[][] player1KnownCards, player2KnownCards;
 
     /// <summary>
     /// 
@@ -36,6 +37,61 @@ class GameBoard : IBoard
         board[centerpoint, centerpoint].setCard(cards[2]);
         board[GRIDSIZE - 1, 0].setCard(cards[3]);
         board[GRIDSIZE - 1, GRIDSIZE - 1].setCard(cards[4]);
+
+
+        int max = GRIDSIZE;
+        player1KnownCards = new bool[max][];
+        player2KnownCards = new bool[max][];
+        for (int x = 0; x < max; x++)
+        {
+            player1KnownCards[x] = new bool[max];
+            player2KnownCards[x] = new bool[max];
+            for (int y = 0; y < max; y++)
+            {
+                if (isStartingZone(x, y))
+                {
+                    player1KnownCards[x][y] = true;
+                    player2KnownCards[x][y] = true;
+                }
+                else
+                {
+                    player1KnownCards[x][y] = false;
+                    player2KnownCards[x][y] = false;
+                }
+            }
+        }
+    }
+
+    private GameBoard(GameBoard other)
+    {
+        this.board = new BoardSpace[GRIDSIZE, GRIDSIZE];
+        bool faceup;
+        for (int y = 0; y < GRIDSIZE; y++)
+        {
+            for (int x = 0; x < GRIDSIZE; x++)
+            {
+                faceup = (x + y) % 2 == 0;
+                board[x, y] = new BoardSpace(x, y, faceup);
+                if (other.board[x, y].getCard() != null)
+                {
+                    board[x, y].setCard(other.board[x, y].getCard().CopyCard());
+                }
+            }
+        }
+        int max = GRIDSIZE;
+        player1KnownCards = new bool[max][];
+        player2KnownCards = new bool[max][];
+
+        for (int x = 0; x < max; x++)
+        {
+            player1KnownCards[x] = new bool[max];
+            player2KnownCards[x] = new bool[max];
+            for (int y = 0; y < max; y++)
+            {
+                player1KnownCards[x][y] = other.player1KnownCards[x][y];
+                player2KnownCards[x][y] = other.player2KnownCards[x][y];
+            }
+        }
     }
 
     public void PrintBoard()
@@ -62,7 +118,7 @@ class GameBoard : IBoard
         }
     }
 
-    public void addCard(int x, int y, ICard card)
+    public void addCard(int player, int x, int y, ICard card)
     {
         if (x < GRIDSIZE && y < GRIDSIZE)
         {
@@ -70,6 +126,14 @@ class GameBoard : IBoard
             if (space.getCard() == null)
             {
                 space.setCard(card);
+                if (player == 0)
+                {
+                    this.player1KnownCards[x][y] = true;
+                }
+                else
+                {
+                    this.player2KnownCards[x][y] = true;
+                }
             }
             else
             {
@@ -104,6 +168,16 @@ class GameBoard : IBoard
             var tempcard = secondSpace.getCard();
             tempcard = firstSpace.swapCard(tempcard);
             tempcard = secondSpace.swapCard(tempcard);
+
+            bool temp;
+            temp = player1KnownCards[x1][y1];
+            player1KnownCards[x1][y1] = player1KnownCards[x2][y2];
+            player1KnownCards[x2][y2] = temp;
+
+            temp = player2KnownCards[x1][y1];
+            player2KnownCards[x1][y1] = player2KnownCards[x2][y2];
+            player2KnownCards[x2][y2] = temp;
+
             Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
         }
         else
@@ -130,8 +204,14 @@ class GameBoard : IBoard
         try
         {
             space.removeCard();
+
+            player1KnownCards[x][y] = false;
+            player2KnownCards[x][y] = false;
+
+
         }
-        catch(Exception e) {
+        catch (Exception e)
+        {
             throw e;
         }
     }
@@ -159,9 +239,9 @@ class GameBoard : IBoard
     public bool isFullColumn(int columnnum)
     {
         int numcards = 0;
-        for (int y = 0;  y < GRIDSIZE; y ++)
+        for (int y = 0; y < GRIDSIZE; y++)
         {
-            if (board[columnnum,y].getCard() != null)
+            if (board[columnnum, y].getCard() != null)
             {
                 numcards++;
             }
@@ -194,9 +274,9 @@ class GameBoard : IBoard
         }
         else
         {
-            Yval = GRIDSIZE -1;
+            Yval = GRIDSIZE - 1;
         }
-        for (int x = 0; x < GRIDSIZE; x ++)
+        for (int x = 0; x < GRIDSIZE; x++)
         {
             if (board[x, Yval].getCard() != null)
             {
@@ -213,5 +293,67 @@ class GameBoard : IBoard
             }
         }
         return numcards == GRIDSIZE;
+    }
+
+    public IBoard CopyBoard()
+    {
+        return new GameBoard(this);
+    }
+
+    private bool isStartingZone(int x, int y)
+    {
+        int max = GRIDSIZE - 1;
+        return ((x == 0 || x == max) && (y == 0 || y == max)) || (x == (max / 2) && y == (max / 2));
+    }
+
+    public string[][] getBoardAsString(IBoard board, bool playerOne)
+    {
+        int max = board.GetBoardDimensions();
+        string[][] boardString = new string[max][];
+
+        for (int x = 0; x < max; x++)
+        {
+            boardString[x] = new string[max];
+            for (int y = 0; y < max; y++)
+            {
+                ICard card = board.GetCardAtSpace(x, y);
+                if (card == null)
+                {
+                    boardString[x][y] = "none";
+                }
+                else if ((x + y) % 2 == 1)
+                {
+                    if (playerOne && player1KnownCards[x][y])
+                    {
+                        boardString[x][y] = card.getFullCard();
+                    }
+                    else if (!playerOne && player2KnownCards[x][y])
+                    {
+                        boardString[x][y] = card.getFullCard();
+                    }
+                    else
+                    {
+                        boardString[x][y] = "uk";
+                    }
+                }
+                else
+                {
+                    boardString[x][y] = card.getFullCard();
+                }
+            }
+        }
+        return boardString;
+    }
+
+    public void Peek(int player, int x, int y)
+    {
+        if (player == 0)
+        {
+            player1KnownCards[x][y] = true;
+        }
+        else
+        {
+            player2KnownCards[x][y] = true;
+        }
     }
 }
