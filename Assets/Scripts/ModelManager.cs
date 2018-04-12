@@ -77,10 +77,19 @@ public class ModelManager : MonoBehaviour
             gameModel = gameModel.CopyGame();
             OnBoardChange(gameModel);
         }
-        else if (Input.GetKeyUp(KeyCode.Alpha1))
+        else if (Input.GetKeyUp(KeyCode.G))
         {
-            var list = gameModel.getAllPlayerMoves(gameModel.getBoard(),true);
-            Debug.Log(list);
+            var strings = gameModel.getBoardAsString(gameModel.getBoard(), gameModel.isPlayerOneTurn());
+            var output = "";
+            for (int x = 0; x < 5; x ++)
+            {
+                for (int y = 0; y < 5; y ++)
+                {
+                    output += strings[x][y] + "  ";
+                }
+                Debug.Log(output);
+                output = "";
+            }
         }
     }
 

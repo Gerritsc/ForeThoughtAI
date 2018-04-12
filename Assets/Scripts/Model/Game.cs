@@ -310,38 +310,6 @@ public class Game : IGame
     public string[][] getBoardAsString (IBoard board, bool playerOne)
     {
         return board.getBoardAsString(board, playerOne);
-        //int max = board.GetBoardDimensions ();
-        //string[][] boardString = new string[max][];
-
-        //for (int x = 0; x < max; x++)
-        //{
-        //    boardString [x] = new string[max];
-        //    for (int y = 0; y < max; y++) 
-        //    {
-        //        ICard card = board.GetCardAtSpace (x, y);
-        //        if (card == null) 
-        //        {
-        //            boardString [x] [y] = "none";
-        //        } 
-        //        else if ((x + y) % 2 == 1)
-        //        {
-        //            if (playerOne && player1KnownCards[x][y]) {
-        //                boardString[x][y] = card.getFullCard ();
-        //            }
-        //            else if (!playerOne && player2KnownCards[x][y]) {
-        //                boardString[x][y] = card.getFullCard ();
-        //            }
-        //            else {
-        //                boardString [x] [y] = "uk";
-        //            }
-        //        } 
-        //        else 
-        //        {
-        //            boardString [x] [y] = card.getFullCard ();
-        //        }
-        //    }
-        //}
-        //return boardString;
     }
 
     public bool isPlayerOneTurn()
