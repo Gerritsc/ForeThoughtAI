@@ -48,7 +48,7 @@ public class BoardSpace
 
             var ret = this.card;
             this.card = card;
-            Console.WriteLine(String.Format("Old: {0}       New: {1}", ret.getFullCard(), this.card.getFullCard()));
+            //Console.WriteLine(String.Format("Old: {0}       New: {1}", ret.getFullCard(), this.card.getFullCard()));
             return ret;
 
         }
