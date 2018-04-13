@@ -2,47 +2,73 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 
-public class RLBrain {
-	//I will name you Squishy, and you will be mine! My Squishy!
-	private static RLBrain squishy = new RLBrain();
+[System.Serializable]
+public class RLBrain
+{
+    //I will name you Squishy, and you will be mine! My Squishy!
 
-	private List<SkyNetNode> skyNetTreeRoots;
+    private List<SkyNetNode> skyNetTreeRoots = new List<SkyNetNode>();
 
-	private int numPlayouts = 1;
+    [System.NonSerialized]
+    public static Mutex fileMut = new Mutex();
 
-	private RLBrain(){
-		skyNetTreeRoots = new List<SkyNetNode> ();
-	}
+    [System.NonSerialized]
+    public static Mutex rootMut = new Mutex();
+    [System.NonSerialized]
+    private static RLBrain squishy = new RLBrain();
+    [System.NonSerialized]
+    private int numPlayouts = 1;
 
-	public static RLBrain FindSquishy(){
-		return squishy;
-	}
+    private RLBrain()
+    {
 
-	public void SelfTeach(int numThoughts){
-		
-		for (int i = 0; i < numThoughts; i++) {
-			ThreadPool.QueueUserWorkItem (TrainOfThought);
-		}
+    }
 
-		int numAvail = 0;
-		int other1 = 0;
-		int maxThreads = 0;
-		int other2 = 0;
-		int numRunning = 0;
+    public static RLBrain FindSquishy()
+    {
+        Load();
+        Save();
+        return squishy;
+    }
 
-		do{
-			//ThreadPool.GetAvailableThreads(out numAvail, out other1);
-			ThreadPool.GetMaxThreads (out maxThreads, out other2);
-			numRunning = (maxThreads - numAvail) + (other2 - other1);
-		}while(numRunning > 0);
+    public void SelfTeach(int numThoughts)
+    {
 
-	}
+        for (int i = 0; i < numThoughts; i++)
+        {
+            ThreadPool.QueueUserWorkItem(TrainOfThought);
+        }
 
-	public void TrainOfThought(object stateInfo){
-		IGame game = new Game ();
-		MCTSkyNet squishyThought = new MCTSkyNet (game, numPlayouts, 5.0f);
+        int numAvail = 0;
+        int other1 = 0;
+        int maxThreads = 0;
+        int other2 = 0;
+        int numRunning = 0;
+
+        do
+        {
+            //ThreadPool.GetAvailableThreads(out numAvail, out other1);
+            ThreadPool.GetMaxThreads(out maxThreads, out other2);
+            numRunning = (maxThreads - numAvail) + (other2 - other1);
+        } while (numRunning > 0);
+        RLBrain.Save();
+    }
+
+    public void Test(){
+        IGame game = new Game();
+        MCTSkyNet squishyThought = new MCTSkyNet(game, numPlayouts, 5.0f);
+        squishyThought.MCTSSingleIteration(squishyThought.GetRoot());
+    }
+
+    public void TrainOfThought(object stateInfo)
+    {
+        IGame game = new Game();
+        MCTSkyNet squishyThought = new MCTSkyNet(game, numPlayouts, 5.0f);
+        Console.WriteLine(squishyThought.GetRoot().ToString());
         bool curBoardTerminal = false;
         int moveCnt = 0;
         while (!curBoardTerminal && moveCnt < 1000000)
@@ -73,31 +99,42 @@ public class RLBrain {
                 moveCnt++;
             }
         }
-		SkyNetNode newRoot = squishyThought.GetRoot ();
+        SkyNetNode newRoot = squishyThought.GetRoot();
         updateRootList(newRoot);
-	}
+    }
 
-	private void updateRootList(SkyNetNode newRoot){
-		int oldInd = skyNetTreeRoots.IndexOf (newRoot);
-		if(oldInd >= 0) {
-			MergeTrees (skyNetTreeRoots[oldInd], newRoot);
-		} else {
-			skyNetTreeRoots.Add(newRoot);
-		}
-	}
+    private void updateRootList(SkyNetNode newRoot)
+    {
+        rootMut.WaitOne();
+        int oldInd = skyNetTreeRoots.IndexOf(newRoot);
+        if (oldInd >= 0)
+        {
+            MergeTrees(skyNetTreeRoots[oldInd], newRoot);
+        }
+        else
+        {
+            skyNetTreeRoots.Add(newRoot);
+        }
+        rootMut.ReleaseMutex();
+    }
 
-	private void MergeTrees(SkyNetNode oldRoot, SkyNetNode newRoot){
-		oldRoot.visitCnt += newRoot.visitCnt;
-		oldRoot.winCnt += newRoot.visitCnt;
-		foreach (SkyNetNode newchild in newRoot.children) {
+    private void MergeTrees(SkyNetNode oldRoot, SkyNetNode newRoot)
+    {
+        oldRoot.visitCnt += newRoot.visitCnt;
+        oldRoot.winCnt += newRoot.visitCnt;
+        foreach (SkyNetNode newchild in newRoot.children)
+        {
             int existInd = oldRoot.children.IndexOf(newchild);
-			if (existInd != -1) {
+            if (existInd != -1)
+            {
                 MergeTrees(oldRoot.children[existInd], newchild);
-            } else {
+            }
+            else
+            {
                 Console.WriteLine("Child Node Error in Merge: NewRoot has child OldRoot does not.");
             }
-		}
-	}
+        }
+    }
 
 
 
@@ -128,6 +165,32 @@ public class RLBrain {
                 }
         }
         game.switchTurn();
+    }
+
+    public static void Save()
+    {
+        fileMut.WaitOne();
+        BinaryFormatter bf = new BinaryFormatter();
+        Console.WriteLine("./SkyNetData/rlbrain.dat");
+        FileStream file = File.Create("./SkyNetData/rlbrain.dat");
+        bf.Serialize(file, squishy);
+        file.Close();
+        fileMut.ReleaseMutex();
+    }
+    public static bool Load()
+    {
+        fileMut.WaitOne();
+        if (File.Exists("./SkyNetData/rlbrain.dat"))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open("./SkyNetData/rlbrain.dat", FileMode.Open);
+            squishy = (RLBrain)bf.Deserialize(file);
+            file.Close();
+            fileMut.ReleaseMutex();
+            return true;
+        }
+        fileMut.ReleaseMutex();
+        return false;
     }
 
 }

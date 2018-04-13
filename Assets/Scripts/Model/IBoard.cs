@@ -88,7 +88,7 @@ public interface IBoard
     /// <param name="board"></param>
     /// <param name="playerOne"></param>
     /// <returns></returns>
-    string[][] getBoardAsString(IBoard board, bool playerOne);
+    string[][] getBoardAsString(bool playerOne);
 
     void Peek(int player, int x, int y);
 }

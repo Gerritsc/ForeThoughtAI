@@ -78,7 +78,6 @@ public class Game : IGame
 
     }
 
-
     public IGame RestartGame()
     {
         return new Game();
@@ -309,7 +308,7 @@ public class Game : IGame
 
     public string[][] getBoardAsString (IBoard board, bool playerOne)
     {
-        return board.getBoardAsString(board, playerOne);
+        return board.getBoardAsString(playerOne);
     }
 
     public bool isPlayerOneTurn()

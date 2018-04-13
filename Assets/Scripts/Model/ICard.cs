@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 /// <summary>
 /// Represents a single card in a deck
 /// </summary>
-public interface ICard
+public interface ICard : ISerializable
 {
     /// <summary>
     /// Returns the suit or color of a card.  For playing cards, suit should be the only important aspect.

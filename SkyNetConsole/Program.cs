@@ -14,6 +14,7 @@ namespace SkyNetConsole
         {
             RLBrain squishy = RLBrain.FindSquishy();
             squishy.SelfTeach(numGames);
+            //squishy.Test();
         }
     }
 }
