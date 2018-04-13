@@ -92,7 +92,7 @@ public class MCTSkyNet
     int numIters;
     float maxWait;
 
-    private bool printStates = true;
+    private bool printStates = false;
 
     public MCTSkyNet(IGame game, int numIters, float maxWait)
     {
@@ -218,15 +218,15 @@ public class MCTSkyNet
             //     movesPerSec = moveCnt / (numMins * 60);
             //     Console.WriteLine(String.Format("Moves: {0} --- Mins: {1} --- MPS: {2}", moveCnt, numMins, movesPerSec));
             // }
-            // // moveCnt++;
-            // // // Console.WriteLine();
-            // // // tmpBoard.PrintBoard();
-            // // // Console.WriteLine();
-            // // if (moveCnt >= 1000000)
-            // // {
-            // //     stalemate = true;
-            // //     return !playerOne;
-            // // }
+            // moveCnt++;
+            // Console.WriteLine();
+            // tmpBoard.PrintBoard();
+            // Console.WriteLine();
+            // if (moveCnt >= 1000000)
+            // {
+            //     stalemate = true;
+            //     return !playerOne;
+            // }
             curBoardTerminal = CheckTerminalBoard(tmpBoard);
             if (!curBoardTerminal)
             {

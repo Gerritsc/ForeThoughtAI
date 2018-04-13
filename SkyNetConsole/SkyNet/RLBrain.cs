@@ -30,8 +30,8 @@ public class RLBrain
 
     public static RLBrain FindSquishy()
     {
-        //Load();
-        //Save();
+        Load();
+        Save();
         return squishy;
     }
 
@@ -68,6 +68,7 @@ public class RLBrain
     {
         IGame game = new Game();
         MCTSkyNet squishyThought = new MCTSkyNet(game, numPlayouts, 5.0f);
+        Console.WriteLine(squishyThought.GetRoot().ToString());
         bool curBoardTerminal = false;
         int moveCnt = 0;
         while (!curBoardTerminal && moveCnt < 1000000)
