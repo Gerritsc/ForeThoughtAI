@@ -163,7 +163,7 @@ class GameBoard : IBoard
 
         if (firstSpace.isFaceUp() == secondSpace.isFaceUp())
         {
-            Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
+            //Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
 
             var tempcard = secondSpace.getCard();
             tempcard = firstSpace.swapCard(tempcard);
@@ -178,7 +178,7 @@ class GameBoard : IBoard
             player2KnownCards[x1][y1] = player2KnownCards[x2][y2];
             player2KnownCards[x2][y2] = temp;
 
-            Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
+            //Console.WriteLine(String.Format("first: {0}     second: {1}", firstSpace.getCard(), secondSpace.getCard()));
         }
         else
         {
@@ -306,9 +306,9 @@ class GameBoard : IBoard
         return ((x == 0 || x == max) && (y == 0 || y == max)) || (x == (max / 2) && y == (max / 2));
     }
 
-    public string[][] getBoardAsString(IBoard board, bool playerOne)
+    public string[][] getBoardAsString(bool playerOne)
     {
-        int max = board.GetBoardDimensions();
+        int max = this.GetBoardDimensions();
         string[][] boardString = new string[max][];
 
         for (int x = 0; x < max; x++)
@@ -316,29 +316,29 @@ class GameBoard : IBoard
             boardString[x] = new string[max];
             for (int y = 0; y < max; y++)
             {
-                ICard card = board.GetCardAtSpace(x, y);
+                ICard card = this.GetCardAtSpace(x, y);
                 if (card == null)
                 {
-                    boardString[x][y] = "none";
+                    boardString[x][y] = "none".PadLeft(17);
                 }
                 else if ((x + y) % 2 == 1)
                 {
                     if (playerOne && player1KnownCards[x][y])
                     {
-                        boardString[x][y] = card.getFullCard();
+                        boardString[x][y] = card.getFullCard().PadLeft(17);
                     }
                     else if (!playerOne && player2KnownCards[x][y])
                     {
-                        boardString[x][y] = card.getFullCard();
+                        boardString[x][y] = card.getFullCard().PadLeft(17);
                     }
                     else
                     {
-                        boardString[x][y] = "uk";
+                        boardString[x][y] = "uk".PadLeft(17);
                     }
                 }
                 else
                 {
-                    boardString[x][y] = card.getFullCard();
+                    boardString[x][y] = card.getFullCard().PadLeft(17);
                 }
             }
         }

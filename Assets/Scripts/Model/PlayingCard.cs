@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
-
+[Serializable]
 public class PlayingCard : ICard
 {
 
@@ -131,5 +132,10 @@ public class PlayingCard : ICard
     public ICard CopyCard()
     {
         return new PlayingCard(this);
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        //throw new NotImplementedException();
     }
 }
