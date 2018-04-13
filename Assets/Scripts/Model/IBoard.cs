@@ -78,4 +78,6 @@ public interface IBoard
     bool isFullRow(int rownum);
 
     bool isFullDiagonal(bool StartLeft);
+
+    IBoard Copy();
 }

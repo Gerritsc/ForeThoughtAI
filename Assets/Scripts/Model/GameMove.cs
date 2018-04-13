@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public enum MoveType { ADD = 0, SWAP, REMOVE, PEEK }
 
+[System.Serializable]
 public class GameMove
 {
     public int x1;
@@ -65,8 +65,11 @@ public class GameMove
                 case MoveType.ADD:
                     return (this.x1 == other.x1 && this.y1 == other.y1) && this.card.Equals(other.card);
                 case MoveType.SWAP:
-                    return this.x1 == other.x1 && this.y1 == other.y1 && this.x2 == other.x2 && this.y2 == other.y2;
+                    return (this.x1 == other.x1 && this.y1 == other.y1 && this.x2 == other.x2 && this.y2 == other.y2) ||
+                        (this.x1 == other.x2 && this.y1 == other.y2 && this.x2 == other.x1 && this.y2 == other.y1);
                 case MoveType.REMOVE:
+                    return this.x1 == other.x1 && this.y1 == other.y1;
+                case MoveType.PEEK:
                     return this.x1 == other.x1 && this.y1 == other.y1;
                 default:
                     return false;
@@ -83,17 +86,17 @@ public class GameMove
         {
             case MoveType.ADD:
                 typeStr = "ADD";
-                typeSpecificStr = String.Format("X-Pos: {1}\nY-Pos: {2}\n{3}", x1.ToString(), y1.ToString(), card.ToString());
+                typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}\n{2}", x1.ToString(), y1.ToString(), card.ToString());
                 break;
             case MoveType.SWAP:
                 typeStr = "SWAP";
-                typeSpecificStr = String.Format("Orig X-Pos: {1}\nOrig Y-Pos: {2}\nNext X-Pos: {3}\n Next Y-Pos: {4}", x1.ToString(), y1.ToString(), x2.ToString(), y2.ToString());
+                typeSpecificStr = String.Format("Orig X-Pos: {0}\nOrig Y-Pos: {1}\nNext X-Pos: {2}\n Next Y-Pos: {3}", x1.ToString(), y1.ToString(), x2.ToString(), y2.ToString());
                 break;
             case MoveType.REMOVE:
                 typeStr = "REMOVE";
-                typeSpecificStr = String.Format("X-Pos: {1}\nY-Pos: {2}", x1.ToString(), y1.ToString());
+                typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}", x1.ToString(), y1.ToString());
                 break;
         }
-        return string.Format("[GameMove]\n{1}\n{2}", typeStr, typeSpecificStr);
+        return string.Format("[GameMove]\n{0}\n{1}", typeStr, typeSpecificStr);
     }
 }
