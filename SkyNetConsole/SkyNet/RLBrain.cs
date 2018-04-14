@@ -11,21 +11,24 @@ public class RLBrain
 {
     //I will name you Squishy, and you will be mine! My Squishy!
 
-    private List<SkyNetNode> skyNetTreeRoots = new List<SkyNetNode>();
+    private static List<SkyNetNode> skyNetTreeRoots = new List<SkyNetNode>();
 
     [System.NonSerialized]
-    public static Mutex fileMut = new Mutex();
+    private static Mutex fileMut = new Mutex();
 
     [System.NonSerialized]
-    public static Mutex rootMut = new Mutex();
+    private static Mutex rootMut = new Mutex();
     [System.NonSerialized]
     private static RLBrain squishy = new RLBrain();
     [System.NonSerialized]
-    private int numPlayouts = 1;
+    private int numPlayouts = 2;
+
+    private IGame constGame = new Game();
+
+    public static readonly int maxMoves = 20000;
 
     private RLBrain()
     {
-
     }
 
     public static RLBrain FindSquishy()
@@ -35,12 +38,12 @@ public class RLBrain
         return squishy;
     }
 
-    public void SelfTeach(int numThoughts)
+    public static void SelfTeach(int numThoughts, int numPlaythroughs)
     {
-
         for (int i = 0; i < numThoughts; i++)
         {
-            ThreadPool.QueueUserWorkItem(TrainOfThought);
+            object[] objArr = new object[] { numThoughts, i, numPlaythroughs };
+            ThreadPool.QueueUserWorkItem(squishy.Test, objArr);
         }
 
         int numAvail = 0;
@@ -51,31 +54,70 @@ public class RLBrain
 
         do
         {
-            //ThreadPool.GetAvailableThreads(out numAvail, out other1);
+            ThreadPool.GetAvailableThreads(out numAvail, out other1);
             ThreadPool.GetMaxThreads(out maxThreads, out other2);
             numRunning = (maxThreads - numAvail) + (other2 - other1);
         } while (numRunning > 0);
-        RLBrain.Save();
     }
 
-    public void Test(){
-        IGame game = new Game();
-        MCTSkyNet squishyThought = new MCTSkyNet(game, numPlayouts, 5.0f);
-        squishyThought.MCTSSingleIteration(squishyThought.GetRoot());
-    }
-
-    public void TrainOfThought(object stateInfo)
+    public void Test(object obj)
     {
+        object[] objArr = obj as object[];
+        int numGames = (int)objArr[0];
+        int i = (int)objArr[1];
+        int numPlaythroughs = (int)objArr[2];
+
+        Log(i, "STARTING");
         IGame game = new Game();
-        MCTSkyNet squishyThought = new MCTSkyNet(game, numPlayouts, 5.0f);
-        Console.WriteLine(squishyThought.GetRoot().ToString());
+        MCTSkyNet squishyThought = new MCTSkyNet(game, numPlaythroughs, 5.0f);
         bool curBoardTerminal = false;
         int moveCnt = 0;
-        while (!curBoardTerminal && moveCnt < 1000000)
+        SkyNetNode gameNode = squishyThought.GetRoot();
+        while (!curBoardTerminal)
         {
-            game.getBoard().PrintBoard();
-            SkyNetNode turnMove = squishyThought.PickOfficialMove();
-            Debug.Assert(turnMove.playerOne == game.isPlayerOneTurn());
+            gameNode = squishyThought.PickOfficialMove(game, gameNode, numPlaythroughs, i);
+            Debug.Assert(gameNode.playerOne == game.isPlayerOneTurn());
+
+            if (gameNode.isTerminal())
+            {
+                curBoardTerminal = true;
+                int winningPlayer = gameNode.playerOne ? 1 : 2;
+                Log(i, String.Format("ENDING -- PLAYER {0} WIN", winningPlayer));
+                continue;
+            }
+            MakeMove(game, gameNode.move);
+            //Console.Write(gameNode.ToString());
+            moveCnt++;
+            //Console.WriteLine(moveCnt);
+            string winPercent = gameNode.visitCnt == 0 ? "0" : (gameNode.winCnt / gameNode.visitCnt).ToString();
+            Console.WriteLine(String.Format("Game: {2} -- Move: {0} -- Win Rate: {1}\n{3}", moveCnt, winPercent.PadRight(4), i, gameNode.move.ToString()));
+            WriteToFile("./SkyNetData/Game_" + i.ToString() + "_Stats.txt", String.Format("Move: {0} -- Num Iters: {1} -- {2}\n{3}", moveCnt, numPlaythroughs, i, gameNode.move.ToString()));
+            if (moveCnt >= maxMoves)
+            {
+                curBoardTerminal = true;
+                Log(i, "GMAE ENDING -- STALEMATE");
+                continue;
+            }
+        }
+
+        updateRootList(squishyThought.GetRoot());
+    }
+
+    private void TrainOfThought(object stateInfo)
+    {
+        IGame game = constGame.CopyGame();
+        MCTSkyNet squishyThought = new MCTSkyNet(game, numPlayouts, 5.0f);
+        Debug.Assert(game.isPlayerOneTurn() != squishyThought.GetRoot().playerOne);
+        bool curBoardTerminal = false;
+        int moveCnt = 0;
+        SkyNetNode gameNode = squishyThought.GetRoot();
+        while (!curBoardTerminal && moveCnt < 100)
+        {
+            //game.getBoard().PrintBoard();
+            //Console.WriteLine(game.isPlayerOneTurn());
+            //Console.WriteLine(gameNode.ToString());
+            //gameNode = squishyThought.PickOfficialMove(game, gameNode);
+            Debug.Assert(gameNode.playerOne == game.isPlayerOneTurn());
             // String[][] bStringArr = game.getBoardAsString(game.getBoard(), game.isPlayerOneTurn());
             // for (int i = 0; i < bStringArr.Length; i++)
             // {
@@ -86,21 +128,20 @@ public class RLBrain
             //    }
             //    Console.WriteLine(toPrint);
             // }
-            if (turnMove.isTerminal())
+            if (gameNode.isTerminal())
             {
                 curBoardTerminal = true;
-                int winningPlayer = turnMove.playerOne ? 1 : 2;
+                int winningPlayer = gameNode.playerOne ? 1 : 2;
                 Console.WriteLine(String.Format("Game Ended. Player {0} wins", winningPlayer));
+                continue;
             }
-            else
-            {
-                MakeMove(game, turnMove.move);
-                Console.WriteLine(String.Format("Move Made!\nPlayer One's: {0}\nMove:\n{1}\n", turnMove.playerOne.ToString(), turnMove.move.ToString()));
-                moveCnt++;
-            }
+
+            MakeMove(game, gameNode.move);
+            Console.Write(gameNode.ToString());
+            moveCnt++;
+            Console.WriteLine(moveCnt);
         }
-        SkyNetNode newRoot = squishyThought.GetRoot();
-        updateRootList(newRoot);
+        updateRootList(squishyThought.GetRoot());
     }
 
     private void updateRootList(SkyNetNode newRoot)
@@ -121,7 +162,7 @@ public class RLBrain
     private void MergeTrees(SkyNetNode oldRoot, SkyNetNode newRoot)
     {
         oldRoot.visitCnt += newRoot.visitCnt;
-        oldRoot.winCnt += newRoot.visitCnt;
+        oldRoot.winCnt += newRoot.winCnt;
         foreach (SkyNetNode newchild in newRoot.children)
         {
             int existInd = oldRoot.children.IndexOf(newchild);
@@ -138,9 +179,9 @@ public class RLBrain
 
 
 
-    public void MakeMove(IGame game, GameMove move)
+    private void MakeMove(IGame game, GameMove move)
     {
-        int playerInt = game.isPlayerOneTurn() ? 1 : 0;
+        int playerInt = game.isPlayerOneTurn() ? 0 : 1;
         switch (move.type)
         {
             case MoveType.ADD:
@@ -164,16 +205,17 @@ public class RLBrain
                     break;
                 }
         }
-        game.switchTurn();
     }
 
     public static void Save()
     {
         fileMut.WaitOne();
         BinaryFormatter bf = new BinaryFormatter();
-        Console.WriteLine("./SkyNetData/rlbrain.dat");
+        Console.WriteLine("SAVED SQUISHY!!!");
         FileStream file = File.Create("./SkyNetData/rlbrain.dat");
-        bf.Serialize(file, squishy);
+        rootMut.WaitOne();
+        bf.Serialize(file, skyNetTreeRoots);
+        rootMut.ReleaseMutex();
         file.Close();
         fileMut.ReleaseMutex();
     }
@@ -182,9 +224,12 @@ public class RLBrain
         fileMut.WaitOne();
         if (File.Exists("./SkyNetData/rlbrain.dat"))
         {
+            Console.WriteLine("FOUND SQUISHY!!!");
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open("./SkyNetData/rlbrain.dat", FileMode.Open);
-            squishy = (RLBrain)bf.Deserialize(file);
+            rootMut.WaitOne();
+            skyNetTreeRoots = (List<SkyNetNode>)bf.Deserialize(file);
+            rootMut.ReleaseMutex();
             file.Close();
             fileMut.ReleaseMutex();
             return true;
@@ -193,4 +238,62 @@ public class RLBrain
         return false;
     }
 
+    public static void RequestExistingRoot(SkyNetNode root)
+    {
+        int ind = skyNetTreeRoots.IndexOf(root);
+        if (ind >= 0)
+        {
+            Console.WriteLine("EXISTING ROOT FOUND-------------------------------------------------------------------");
+            root = skyNetTreeRoots[ind];
+        }
+    }
+
+    public static void PrintTree(int treeNum)
+    {
+        rootMut.WaitOne();
+        foreach (SkyNetNode n in skyNetTreeRoots)
+        {
+            string filestr = "./SkyNetData/Tree" + treeNum.ToString() + ".txt";
+            WriteToFile(filestr, n.ToString());
+            PrintTreeHelper(n, 0, filestr);
+        }
+        rootMut.ReleaseMutex();
+    }
+
+    private static void PrintTreeHelper(SkyNetNode curNode, int lev, string filestr)
+    {
+        if (curNode.winCnt / curNode.visitCnt <= 1.0f)
+        {
+            WriteToFile(filestr, "\n Level: " + lev.ToString() + "\n" + curNode.ToString());
+        }
+        int nxtlev = lev + 1;
+        foreach (SkyNetNode child in curNode.children)
+        {
+            PrintTreeHelper(child, nxtlev, filestr);
+        }
+    }
+
+    private static void WriteToFile(string filestr, string text)
+    {
+        //fileMut.WaitOne();
+        if (!System.IO.File.Exists(filestr))
+        {
+            System.IO.File.WriteAllText(filestr, text);
+        }
+        else
+        {
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(filestr, true))
+            {
+                file.WriteLine(text);
+            }
+        }
+        //fileMut.ReleaseMutex();
+    }
+
+    public static void Log(int gameNum, string msg)
+    {
+        string toPrint = String.Format("Game: {0} -- {1}", gameNum.ToString().PadRight(4), msg);
+        Console.WriteLine(toPrint);
+        WriteToFile("./SkyNetData/Game_" + gameNum.ToString() + "_Stats.txt", toPrint);
+    }
 }

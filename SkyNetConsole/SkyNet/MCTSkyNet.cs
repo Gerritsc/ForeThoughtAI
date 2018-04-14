@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics;
+using System.Threading;
 
 [System.Serializable]
 public class SkyNetNode
@@ -12,23 +14,28 @@ public class SkyNetNode
     public int winCnt;
     bool terminal;
     string boardHash;
+    string hand;
     public List<SkyNetNode> children;
     private List<ICard> winningHand;
     private HANDTYPE winningType;
 
-    public SkyNetNode(string boardHash, bool playerOne)
+    private int level;
+
+    public SkyNetNode(string boardHash, bool playerOne, string hand)
     {
         this.move = null;
         this.parent = null;
         this.children = new List<SkyNetNode>();
         this.playerOne = playerOne;
         this.boardHash = boardHash;
+        this.hand = hand;
         this.terminal = false;
         this.winCnt = 1;
         this.visitCnt = 1;
+        this.level = 0;
     }
 
-    public SkyNetNode(GameMove move, SkyNetNode prevNode, bool playerOne, string boardHash)
+    public SkyNetNode(GameMove move, SkyNetNode prevNode, bool playerOne, string boardHash, string hand)
     {
         this.move = move;
         this.parent = prevNode;
@@ -36,8 +43,10 @@ public class SkyNetNode
         this.playerOne = playerOne;
         this.terminal = false;
         this.boardHash = boardHash;
+        this.hand = hand;
         this.winCnt = 1;
         this.visitCnt = 1;
+        this.level = parent.level + 1;
     }
 
     public void incWinAndVisit(bool playerOne, bool stalemate)
@@ -47,6 +56,7 @@ public class SkyNetNode
         {
             winCnt++;
         }
+        //Console.Write(this.ToString());
     }
 
     public void setTerminalFlag(bool term, List<ICard> hand, HANDTYPE type)
@@ -67,16 +77,29 @@ public class SkyNetNode
         {
             return false;
         }
-        bool equalExceptParent = this.terminal.Equals(((SkyNetNode)obj).terminal) && this.boardHash.Equals(((SkyNetNode)obj).boardHash) && this.move.Equals(((SkyNetNode)obj).move) && this.playerOne.Equals(((SkyNetNode)obj).playerOne);
+        if(obj == this){
+            return true;
+        }
+        bool bothMove = (this.move != null) && (((SkyNetNode)obj).move != null);
+        bool bothNotMove = (this.move == null) && (((SkyNetNode)obj).move == null);
+        bool equalNoParOrMov = this.terminal.Equals(((SkyNetNode)obj).terminal) && 
+                                this.boardHash.Equals(((SkyNetNode)obj).boardHash) &&
+                                this.hand.Equals(((SkyNetNode)obj).hand) && 
+                                this.playerOne.Equals(((SkyNetNode)obj).playerOne);
         bool bothAreBatman = (this.parent == null) && (((SkyNetNode)obj).parent == null);
-        return (bothAreBatman) ? equalExceptParent : ((SkyNetNode)obj).parent.Equals(this.parent) && equalExceptParent;
+        if((bothMove || bothNotMove) && equalNoParOrMov){
+            bool parents = bothAreBatman ? true : ((SkyNetNode)obj).parent.Equals(this.parent);
+            bool moveGood = bothMove ? ((SkyNetNode)obj).move.Equals(this.move) : bothNotMove;
+            return parents && moveGood;
+        }
+        return false;
     }
 
     public override string ToString()
     {
         string winPercent = visitCnt == 0 ? "0" : (winCnt / visitCnt).ToString();
         string movStr = move != null ? move.ToString() : "";
-        string dispStr = String.Format("\n[SkyNetNode]\nMove: {0}\nWin Percent: {1}\nNum Children: {2}\nPlayer One: {3}\nTerminal: {4}\n", movStr, winPercent, children.Count.ToString(), this.playerOne.ToString(), this.terminal.ToString());
+        string dispStr = String.Format("\n[SkyNetNode]\nMove: {0}\nWin Percent: {1}\nNum Children: {2}\nPlayer One: {3}\nTerminal: {4}\nVisit: {5}\nWin: {6}\nLevel: {7}\nHash: {8}\n", movStr, winPercent, children.Count.ToString(), this.playerOne.ToString(), this.terminal.ToString(), visitCnt, winCnt, level, boardHash);
         return dispStr;
     }
 }
@@ -85,24 +108,26 @@ public class MCTSkyNet
 {
 
     SkyNetNode rootNode;
-    SkyNetNode curNode;
-    ZobristKiller hashAndSlasher;
+    //ZobristKiller hashAndSlasher;
 
-    IGame curGame;
     int numIters;
     float maxWait;
 
+    static Mutex rootMut = new Mutex();
     private bool printStates = false;
 
     public MCTSkyNet(IGame game, int numIters, float maxWait)
     {
         this.maxWait = maxWait;
         this.numIters = numIters;
-        hashAndSlasher = ZobristKiller.GetTheKiller();
-        curGame = game;
-        String[][] localBString = curGame.getBoardAsString(curGame.getBoard(), curGame.isPlayerOneTurn());
-        rootNode = new SkyNetNode(hashAndSlasher.HashIt(localBString), !curGame.isPlayerOneTurn());
-        curNode = rootNode;
+        //hashAndSlasher = ZobristKiller.GetTheKiller();
+        string localBString = game.getBoardAsString(game.getBoard(), !game.isPlayerOneTurn());
+        rootNode = new SkyNetNode(localBString, !game.isPlayerOneTurn(), game.getHandAsString(!game.isPlayerOneTurn()));
+        RLBrain.RequestExistingRoot(rootNode);
+    }
+
+    public void SetRoot(SkyNetNode newRoot){
+        this.rootNode = newRoot;
     }
 
     private void DebugPrint(string msg)
@@ -113,33 +138,45 @@ public class MCTSkyNet
         }
     }
 
-    public SkyNetNode PickOfficialMove()
+    public SkyNetNode PickOfficialMove(IGame game, SkyNetNode gameNode, int numIters, int gameNum)
     {
-        IBoard localBoard = curGame.getBoard();
-        DateTime curTime = DateTime.UtcNow;
-        DateTime endTime = DateTime.UtcNow.AddSeconds(maxWait);
-        for (int i = 0; ((i < numIters) && (DateTime.Compare(curTime, endTime) <= 0)); i++)
+        //DateTime curTime = DateTime.UtcNow;
+        //DateTime endTime = DateTime.UtcNow.AddSeconds(maxWait);
+        //for(int i = 0; i < numIters && DateTime.Compare(curTime, endTime) <= 0; i++)
+        for(int i = 0; i < numIters; i++)
         {
-            MCTSSingleIteration(curNode);
-            curTime = DateTime.UtcNow;
+            RLBrain.Log(gameNum, String.Format("ITERATION {0}/{1}", i + 1, numIters));
+            MCTSSingleIteration(game.CopyGame(), gameNode, i);
+            //curTime = DateTime.UtcNow;
         }
-        SkyNetNode chosen = MCTSSelect(curNode);
-        curNode = chosen;
+
+        // int numAvail = 0;
+        // int other1 = 0;
+        // int maxThreads = 0;
+        // int other2 = 0;
+        // int numRunning = 0;
+
+        // do
+        // {
+        //     ThreadPool.GetAvailableThreads(out numAvail, out other1);
+        //     ThreadPool.GetMaxThreads(out maxThreads, out other2);
+        //     numRunning = (maxThreads - numAvail) + (other2 - other1);
+        //     //Console.WriteLine(String.Format("{0} RUNNING -- {1} AVAILABLE", numRunning, numAvail));
+        // } while (numRunning > 0);
+        
+        SkyNetNode chosen = MCTSSelect(gameNode, -1);
         return chosen;
     }
 
-    public void MCTSSingleIteration(SkyNetNode localRoot)
+    public void MCTSSingleIteration(IGame curGame, SkyNetNode gameNode, int iterNum)
     {
-        SkyNetNode curNode = localRoot;
-        while (curNode.children.Count > 0)
-        {//while the node has children
-            curNode = MCTSSelect(curNode);
-        }
-        MCTSExpand(curNode);
-        SkyNetNode pickedChild = MCTSSelect(curNode);
+        //Console.WriteLine(String.Format("ENTERING ITERATION -- {0}", iterNum));
+        MCTSExpand(curGame, gameNode, iterNum);
+        SkyNetNode pickedChild = MCTSSelect(gameNode, iterNum);
         bool stalemate = false;
-        bool playerOneWin = MCTSRandSimPlayout(pickedChild, ref stalemate);
-        MCTSBackpropWin(pickedChild, playerOneWin, stalemate);
+        bool playerOneWin = MCTSRandSimPlayout(curGame, pickedChild, ref stalemate, iterNum);
+        MCTSBackpropWin(pickedChild, playerOneWin, stalemate, iterNum);
+        //Console.WriteLine(String.Format("EXITING ITERATION -- {0}", iterNum));
     }
 
     public SkyNetNode GetRoot()
@@ -147,35 +184,45 @@ public class MCTSkyNet
         return rootNode;
     }
 
-    private void MCTSExpand(SkyNetNode curNode)
+    private void MCTSExpand(IGame curGame, SkyNetNode gameNode, int iterNum)
     {
         if (printStates)
         {
-            DebugPrint("ENTERING MCTS EXPANSION\n");
+            DebugPrint("ENTERING MCTS EXPANSION -- " + iterNum.ToString() +"\n");
+            //DebugPrint(gameNode.ToString());
         }
-        bool playerOne = !curNode.playerOne;
+        Debug.Assert(curGame.isPlayerOneTurn() != gameNode.playerOne);
         IBoard localBoard = curGame.getBoard();
-        List<GameMove> availMoves = curGame.getAllPlayerMoves(localBoard, playerOne);
+        List<GameMove> availMoves = curGame.getAllPlayerMoves(localBoard, curGame.isPlayerOneTurn());
         int cnt = availMoves.Count;
-        string hash = hashAndSlasher.HashIt(curGame.getBoardAsString(localBoard, playerOne));
-        CheckTerminalNode(localBoard, curNode);
-        if (cnt > 0 && !curNode.isTerminal())
+        CheckTerminalNode(curGame, localBoard, gameNode);
+        rootMut.WaitOne();
+        if (cnt > 0 && !gameNode.isTerminal())
         {
-            curNode.children = new List<SkyNetNode>();
+            if(gameNode.children == null){gameNode.children = new List<SkyNetNode>();}
             for (int i = 0; i < cnt; i++)
             {
-                curNode.children.Add(new SkyNetNode(availMoves[i], curNode, playerOne, hash));
-                DebugPrint(String.Format("Added new Child Node at Index: {0}{1}\n", i.ToString(), curNode.children[i].ToString()));
+                IGame tmpGame = curGame.CopyGame();
+                MakeMove(tmpGame, availMoves[i]);
+                Debug.Assert(tmpGame.isPlayerOneTurn() == gameNode.playerOne);
+                string hash = tmpGame.getBoardAsString(tmpGame.getBoard(), curGame.isPlayerOneTurn());
+                SkyNetNode toAdd = new SkyNetNode(availMoves[i], gameNode, curGame.isPlayerOneTurn(), hash, tmpGame.getHandAsString(curGame.isPlayerOneTurn()));
+                if(!gameNode.children.Contains(toAdd)){
+                    gameNode.children.Add(toAdd);
+                    DebugPrint(String.Format("Added new Child Node at Index: {0}{1}\n", i.ToString(), toAdd.ToString()));
+                }
             }
         }
-        DebugPrint("EXITING MCTS EXPANSION\n");
+        rootMut.ReleaseMutex();
+        DebugPrint("EXITING MCTS EXPANSION -- " + iterNum.ToString() +"\n");
     }
 
-    private SkyNetNode MCTSSelect(SkyNetNode curNode)
+    private SkyNetNode MCTSSelect(SkyNetNode curNode, int iterNum)
     {
-        DebugPrint("ENTERING MCTS SELECTION\n");
+        DebugPrint("ENTERING MCTS SELECTION -- " + iterNum.ToString() +"\n");
         SkyNetNode toRet = curNode;
         float topWinRate = -1.0f;
+        rootMut.WaitOne();
         foreach (SkyNetNode skyNode in curNode.children)
         {
             float childWinRate = skyNode.visitCnt == 0 ? 0 : skyNode.winCnt / skyNode.visitCnt;
@@ -183,75 +230,79 @@ public class MCTSkyNet
             {
                 toRet = skyNode;
                 topWinRate = childWinRate;
-                DebugPrint(String.Format("Found More Valuable Child {0}\n", toRet.ToString()));
+                DebugPrint("Found More Valuable Child\n");
             }
         }
-        DebugPrint("EXITING MCTS SELECTION\n");
+        rootMut.ReleaseMutex();
+        DebugPrint("EXITING MCTS SELECTION -- " + iterNum.ToString() +"\n");
         return toRet;
     }
 
-    private bool MCTSRandSimPlayout(SkyNetNode curNode, ref bool stalemate)
+    private bool MCTSRandSimPlayout(IGame curGame, SkyNetNode curNode, ref bool stalemate, int iterNum)
     {
-        DebugPrint("ENTERING MCTS SIM PLAYOUT\n");
-        IBoard tmpBoard = curGame.getBoard().Copy();
+        DebugPrint("ENTERING MCTS SIM PLAYOUT -- " + iterNum.ToString() +"\n");
+        IGame tmpGame = curGame.CopyGame();
+        Debug.Assert(tmpGame.isPlayerOneTurn() == curNode.playerOne);
+        MakeMove(tmpGame, curNode.move);
+        IBoard tmpBoard = tmpGame.getBoard();
         bool curBoardTerminal = curNode.isTerminal();
         Random rand = new Random();
-        bool playerOne = curNode.playerOne;
         float moveCnt = 0;
-        float numMins = 0;
-        DateTime curTime = DateTime.UtcNow;
-        DateTime nextPrint = curTime.AddMinutes(1);
-        float movesPerSec = 0.0f;
+        // float numMins = 0;
+        // DateTime curTime = DateTime.UtcNow;
+        // DateTime nextPrint = curTime.AddMinutes(1);
+        // float movesPerSec = 0.0f;
         while (!curBoardTerminal)
         {
-            List<GameMove> availMoves = curGame.getAllPlayerMoves(tmpBoard, playerOne);
+            List<GameMove> availMoves = tmpGame.getAllPlayerMoves(tmpBoard, tmpGame.isPlayerOneTurn());
             int cnt = availMoves.Count;
             int randMoveInd = rand.Next(0, availMoves.Count);
             GameMove randMove = availMoves[randMoveInd];
-            DebugPrint(String.Format("Move Made!\nPlayer One's: {0}\nMove: {1}\n", playerOne.ToString(), randMove.ToString()));
-            MockMove(tmpBoard, randMove);
+            //DebugPrint(String.Format("Move Made!\nPlayer One's: {0}\nMove: {1}\n", tmpGame.isPlayerOneTurn().ToString(), randMove.ToString()));
+            MakeMove(tmpGame, randMove);
             // curTime = DateTime.UtcNow;
             // if (curTime.CompareTo(nextPrint) > 0)
             // {
             //     nextPrint = curTime.AddMinutes(1);
             //     numMins++;
             //     movesPerSec = moveCnt / (numMins * 60);
-            //     Console.WriteLine(String.Format("Moves: {0} --- Mins: {1} --- MPS: {2}", moveCnt, numMins, movesPerSec));
+            //     //DebugPrint(String.Format("Moves: {0} --- Mins: {1} --- MPS: {2}\n", moveCnt, numMins, movesPerSec));
             // }
-            // moveCnt++;
-            // Console.WriteLine();
-            // tmpBoard.PrintBoard();
-            // Console.WriteLine();
-            // if (moveCnt >= 1000000)
-            // {
-            //     stalemate = true;
-            //     return !playerOne;
-            // }
-            curBoardTerminal = CheckTerminalBoard(tmpBoard);
-            if (!curBoardTerminal)
+            moveCnt++;
+            if (moveCnt >= RLBrain.maxMoves)
             {
-                playerOne = !playerOne;
+                stalemate = true;
+                DebugPrint("EXITING MCTS SIM PLAYOUT -- " + iterNum.ToString() +"\n");
+                return !tmpGame.isPlayerOneTurn();
+            }
+            curBoardTerminal = CheckTerminalBoard(tmpGame, tmpBoard);
+            if (curBoardTerminal)
+            {
+                //same thing as "return !curGame.isPlayerOneTurn();"
+                tmpGame.switchTurn();
             }
         }
-        DebugPrint("Player One Win: " + playerOne.ToString() + "\n");
-        DebugPrint("EXITING MCTS SIM PLAYOUT\n");
-        return playerOne;
+        DebugPrint("Player One Win: " + tmpGame.isPlayerOneTurn().ToString() + "\n");
+        DebugPrint("EXITING MCTS SIM PLAYOUT -- " + iterNum.ToString() +"\n");
+        return tmpGame.isPlayerOneTurn();
     }
 
-    private void MCTSBackpropWin(SkyNetNode endNode, bool playerOneWin, bool stalemate)
+    private void MCTSBackpropWin(SkyNetNode endNode, bool playerOneWin, bool stalemate, int iterNum)
     {
-        DebugPrint("ENTERING MCTS BACKPROPOGATION\n");
+        rootMut.WaitOne();
+        DebugPrint("ENTERING MCTS BACKPROPOGATION -- " + iterNum.ToString() +"\n");
         SkyNetNode cur = endNode;
         while (cur != null)
         {
             cur.incWinAndVisit(playerOneWin, stalemate);
-            DebugPrint(cur.ToString());
+            //DebugPrint(cur.ToString());
             cur = cur.parent;
         }
-        DebugPrint("EXITING MCTS BACKPROPOGATION\n");
+        rootMut.ReleaseMutex();
+        DebugPrint("EXITING MCTS BACKPROPOGATION -- " + iterNum.ToString() +"\n");
     }
 
-    private void CheckTerminalNode(IBoard board, SkyNetNode curNode)
+    private void CheckTerminalNode(IGame curGame, IBoard board, SkyNetNode curNode)
     {
         List<ICard> toTestDiag1 = new List<ICard>();
         List<ICard> toTestDiag2 = new List<ICard>();
@@ -282,6 +333,7 @@ public class MCTSkyNet
                     toTestVert.Add(card4);
                 }
             }
+            rootMut.WaitOne();
             foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE)))
             {
                 if (toTestHoriz.Count > 0 && curGame.CheckGameOverClaim(toTestHoriz, t))
@@ -294,7 +346,9 @@ public class MCTSkyNet
                 }
 
             }
+            rootMut.ReleaseMutex();
         }
+        rootMut.WaitOne();
         foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE)))
         {
             if (curGame.CheckGameOverClaim(toTestDiag1, t))
@@ -306,11 +360,12 @@ public class MCTSkyNet
                 curNode.setTerminalFlag(true, toTestDiag2, t);
             }
         }
+        rootMut.ReleaseMutex();
     }
 
-    private bool CheckTerminalBoard(IBoard board)
+    private bool CheckTerminalBoard(IGame curGame, IBoard board)
     {
-        bool terminal = curNode.isTerminal();
+        bool terminal = false;
         List<ICard> toTestDiag1 = new List<ICard>();
         List<ICard> toTestDiag2 = new List<ICard>();
         for (int i = 0; i < 5 && !terminal; i++)
@@ -355,23 +410,45 @@ public class MCTSkyNet
         return terminal;
     }
 
-    private void MockMove(IBoard board, GameMove move)
+    private void MakeMove(IGame game, GameMove move)
     {
-        int player = (curGame.isPlayerOneTurn()) ? 0 : 1;
+        int playerInt = game.isPlayerOneTurn() ? 0 : 1;
         switch (move.type)
         {
             case MoveType.ADD:
-                board.addCard(move.x1, move.y1, move.card);
-                break;
-            case MoveType.REMOVE:
-                board.removeCard(move.x1, move.y1);
-                break;
+                {
+                    game.PlayCard(playerInt, move.x1, move.y1, move.card);
+                    break;
+                }
             case MoveType.SWAP:
-                board.swapCards(move.x1, move.y1, move.x2, move.y2);
-                break;
+                {
+                    game.SwapCards(playerInt, move.x1, move.y1, move.x2, move.y2);
+                    break;
+                }
+            case MoveType.REMOVE:
+                {
+                    game.RemoveCard(playerInt, move.x1, move.y1);
+                    break;
+                }
             case MoveType.PEEK:
-                //board.peek(move.x1, move.y1);
-                break;
+                {
+                    game.addPeekToKnown(move.x1, move.x2);
+                    break;
+                }
+        }
+    }
+
+    public void PrintTree(SkyNetNode root){
+        PrintTreeHelper(root, 0);
+    }
+
+    private void PrintTreeHelper(SkyNetNode curNode, int lev){
+        if(curNode.winCnt/curNode.visitCnt < 1.0f){
+            Console.Write("\n Level: " + lev.ToString() + "\n" + curNode.ToString());
+        }
+        int nxtlev = lev + 1;
+        foreach(SkyNetNode child in curNode.children){
+            PrintTreeHelper(child, nxtlev);
         }
     }
 }
