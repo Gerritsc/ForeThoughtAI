@@ -134,6 +134,14 @@ public class ClaimManager : MonoBehaviour {
         }
         if (win)
         {
+            foreach (var card in selectedCards)
+            {
+                if (!card.isFaceup())
+                {
+                    card.flipUp();
+                    card.setOutlineColor(2);
+                }
+            }
             model.GameWon();
         }
     }

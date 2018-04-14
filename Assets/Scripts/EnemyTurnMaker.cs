@@ -123,6 +123,11 @@ public class EnemyTurnMaker : MonoBehaviour {
                     {
                         var space1 = (from space in FindObjectsOfType<BoardSpaceStruct>() where (space.x == j && space.y == i) select space).FirstOrDefault();
                         space1.setOutlineColor(2);
+                        if (!space1.isFaceup())
+                        {
+                            space1.flipUp();
+                        }
+
                     }
                     return;
                 }
@@ -132,6 +137,10 @@ public class EnemyTurnMaker : MonoBehaviour {
                     {
                         var space1 = (from space in FindObjectsOfType<BoardSpaceStruct>() where (space.x == i && space.y == j) select space).FirstOrDefault();
                         space1.setOutlineColor(2);
+                        if (!space1.isFaceup())
+                        {
+                            space1.flipUp();
+                        } 
                     }
                     return;
                 }

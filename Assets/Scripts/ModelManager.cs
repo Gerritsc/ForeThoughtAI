@@ -20,7 +20,7 @@ public class ModelManager : MonoBehaviour
 
     public enum GameState
     {
-        PlayerPlay, PlayerClaim, EnemyTurn, WinState
+        PlayerPlay, PlayerClaim, EnemyTurn, WinState, LoseState
     }
 
     // Use this for initialization
@@ -73,13 +73,9 @@ public class ModelManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.Space) && currentstate == GameState.PlayerClaim)
         {
-            gameModel = gameModel.CopyGame();
-            OnBoardChange(gameModel);
-        }
-        else if (Input.GetKeyUp(KeyCode.G))
-        {
+            switchState();
         }
     }
 
@@ -119,7 +115,12 @@ public class ModelManager : MonoBehaviour
                 }
             case GameState.WinState:
                 {
-                    DisplayTurn.text = "You Win goodsir";
+                    DisplayTurn.text = "You Win!";
+                    break;
+                }
+            case GameState.LoseState:
+                {
+                    DisplayTurn.text = "The Enemy Wins!";
                     break;
                 }
         }
@@ -133,8 +134,30 @@ public class ModelManager : MonoBehaviour
         FindObjectOfType<ClaimManager>().enabled = false;
         FindObjectOfType<ClaimGameRenderer>().disableClaims();
 
+        StartCoroutine(restartGame());
+    }
+
+    public void GameLost()
+    {
+        this.currentstate = GameState.LoseState;
         changeDisplayText();
-        //gameModel = gameModel.RestartGame();
-        //OnBoardChange(gameModel);
+
+        StartCoroutine(restartGame());
+    }
+
+    private IEnumerator restartGame()
+    {
+        changeDisplayText();
+        yield return new WaitForSeconds(4f);
+
+        gameModel = gameModel.RestartGame();
+
+        currentstate = GameState.PlayerPlay;
+        FindObjectOfType<PlayerTurnManager>().enabled = true;
+        FindObjectOfType<ClaimManager>().enabled = false;
+
+        changeDisplayText();
+
+        OnBoardChange(gameModel);
     }
 }
