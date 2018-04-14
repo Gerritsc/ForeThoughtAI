@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -79,17 +80,6 @@ public class ModelManager : MonoBehaviour
         }
         else if (Input.GetKeyUp(KeyCode.G))
         {
-            var strings = gameModel.getBoardAsString(gameModel.getBoard(), gameModel.isPlayerOneTurn());
-            var output = "";
-            for (int x = 0; x < 5; x ++)
-            {
-                for (int y = 0; y < 5; y ++)
-                {
-                    output += strings[x][y] + "  ";
-                }
-                Debug.Log(output);
-                output = "";
-            }
         }
     }
 
@@ -146,6 +136,5 @@ public class ModelManager : MonoBehaviour
         changeDisplayText();
         //gameModel = gameModel.RestartGame();
         //OnBoardChange(gameModel);
-
     }
 }

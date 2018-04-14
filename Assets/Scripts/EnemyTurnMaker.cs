@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -23,7 +24,7 @@ public class EnemyTurnMaker : MonoBehaviour {
     {
         var playsToMake = model.gameModel.getAllPlayerMoves(model.gameModel.getBoard(),false);
 
-        int rand = Random.Range(0, playsToMake.Count - 1);
+        int rand = UnityEngine.Random.Range(0, playsToMake.Count - 1);
 
         var playToMake = playsToMake[rand];
 
@@ -73,5 +74,61 @@ public class EnemyTurnMaker : MonoBehaviour {
         space2.setOutlineColor(0);
 
         DisplayText.enabled = false;
+    }
+
+    private bool CheckTerminalBoard(IGame curGame, IBoard board)
+    {
+        bool terminal = false;
+        List<ICard> toTestDiag1 = new List<ICard>();
+        List<ICard> toTestDiag2 = new List<ICard>();
+        for (int i = 0; i < 5 && !terminal; i++)
+        {
+            List<ICard> toTestHoriz = new List<ICard>();
+            List<ICard> toTestVert = new List<ICard>();
+            ICard card1 = board.GetCardAtSpace(i, i);
+            ICard card2 = board.GetCardAtSpace(i, 4 - i);
+            if (card1 != null)
+            {
+                toTestDiag1.Add(card1);
+            }
+            if (card2 != null)
+            {
+                toTestDiag2.Add(card2);
+            }
+            for (int j = 0; j < 5 && (toTestHoriz.Count == j || toTestVert.Count == j); j++)
+            {
+                ICard card3 = board.GetCardAtSpace(j, i);
+                ICard card4 = board.GetCardAtSpace(i, j);
+                if (card3 != null)
+                {
+                    toTestHoriz.Add(card3);
+                }
+                if (card4 != null)
+                {
+                    toTestVert.Add(card4);
+                }
+            }
+
+            if (toTestVert.Count != 5 && toTestHoriz.Count != 5)
+            {
+                continue;
+            }
+
+            foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE)))
+            {
+                terminal = curGame.CheckGameOverClaim(toTestHoriz, t) ||
+                    curGame.CheckGameOverClaim(toTestVert, t);
+
+                if (terminal)
+                {
+                    return terminal;
+                }
+            }
+        }
+        foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE)))
+        {
+            terminal = curGame.CheckGameOverClaim(toTestDiag1, t) || curGame.CheckGameOverClaim(toTestDiag2, t);
+        }
+        return terminal;
     }
 }
