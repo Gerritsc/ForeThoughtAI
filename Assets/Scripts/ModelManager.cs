@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,7 +20,7 @@ public class ModelManager : MonoBehaviour
 
     public enum GameState
     {
-        PlayerPlay, PlayerClaim, EnemyTurn, WinState
+        PlayerPlay, PlayerClaim, EnemyTurn, WinState, LoseState
     }
 
     // Use this for initialization
@@ -72,24 +73,9 @@ public class ModelManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.Space) && currentstate == GameState.PlayerClaim)
         {
-            gameModel = gameModel.CopyGame();
-            OnBoardChange(gameModel);
-        }
-        else if (Input.GetKeyUp(KeyCode.G))
-        {
-            var strings = gameModel.getBoardAsString(gameModel.getBoard(), gameModel.isPlayerOneTurn());
-            var output = "";
-            for (int x = 0; x < 5; x ++)
-            {
-                for (int y = 0; y < 5; y ++)
-                {
-                    output += strings[x][y] + "  ";
-                }
-                Debug.Log(output);
-                output = "";
-            }
+            switchState();
         }
     }
 
@@ -129,7 +115,12 @@ public class ModelManager : MonoBehaviour
                 }
             case GameState.WinState:
                 {
-                    DisplayTurn.text = "You Win goodsir";
+                    DisplayTurn.text = "You Win!";
+                    break;
+                }
+            case GameState.LoseState:
+                {
+                    DisplayTurn.text = "The Enemy Wins!";
                     break;
                 }
         }
@@ -143,9 +134,30 @@ public class ModelManager : MonoBehaviour
         FindObjectOfType<ClaimManager>().enabled = false;
         FindObjectOfType<ClaimGameRenderer>().disableClaims();
 
-        changeDisplayText();
-        //gameModel = gameModel.RestartGame();
-        //OnBoardChange(gameModel);
+        StartCoroutine(restartGame());
+    }
 
+    public void GameLost()
+    {
+        this.currentstate = GameState.LoseState;
+        changeDisplayText();
+
+        StartCoroutine(restartGame());
+    }
+
+    private IEnumerator restartGame()
+    {
+        changeDisplayText();
+        yield return new WaitForSeconds(6f);
+
+        gameModel = gameModel.RestartGame();
+
+        currentstate = GameState.PlayerPlay;
+        FindObjectOfType<PlayerTurnManager>().enabled = true;
+        FindObjectOfType<ClaimManager>().enabled = false;
+
+        changeDisplayText();
+
+        OnBoardChange(gameModel);
     }
 }
