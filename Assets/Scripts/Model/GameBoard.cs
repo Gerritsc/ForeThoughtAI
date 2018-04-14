@@ -129,10 +129,18 @@ class GameBoard : IBoard
                 if (player == 0)
                 {
                     this.player1KnownCards[x][y] = true;
+                    if ((x + y) % 2 == 0) 
+                    {
+                        this.player2KnownCards[x][y] = true;
+                    }
                 }
                 else
                 {
                     this.player2KnownCards[x][y] = true;
+                    if ((x + y) % 2 == 0) 
+                    {
+                        this.player1KnownCards[x][y] = true;
+                    }
                 }
             }
             else
@@ -355,5 +363,18 @@ class GameBoard : IBoard
         {
             player2KnownCards[x][y] = true;
         }
+    }
+
+    public bool isKnown(int player, int x, int y)
+    {
+        if (player == 0)
+        {
+            return player1KnownCards[x][y];
+        } 
+        else 
+        {
+            return player2KnownCards[x][y];
+        }
+
     }
 }

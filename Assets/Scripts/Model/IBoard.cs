@@ -91,4 +91,6 @@ public interface IBoard
     string[][] getBoardAsString(bool playerOne);
 
     void Peek(int player, int x, int y);
+
+    bool isKnown(int player, int x, int y);
 }

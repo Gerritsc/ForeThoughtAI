@@ -52,6 +52,7 @@ public class EnemyTurnMaker : MonoBehaviour {
         }
 
         model.updateBoard();
+        this.CheckTerminalBoard(model.gameModel, model.gameModel.getBoard());
         model.switchState();
 
     }
@@ -76,7 +77,7 @@ public class EnemyTurnMaker : MonoBehaviour {
         DisplayText.enabled = false;
     }
 
-    private bool CheckTerminalBoard(IGame curGame, IBoard board)
+    private void CheckTerminalBoard(IGame curGame, IBoard board)
     {
         bool terminal = false;
         List<ICard> toTestDiag1 = new List<ICard>();
@@ -99,11 +100,11 @@ public class EnemyTurnMaker : MonoBehaviour {
             {
                 ICard card3 = board.GetCardAtSpace(j, i);
                 ICard card4 = board.GetCardAtSpace(i, j);
-                if (card3 != null)
+                if (card3 != null && board.isKnown(1, j, i))
                 {
                     toTestHoriz.Add(card3);
                 }
-                if (card4 != null)
+                if (card4 != null && board.isKnown(1, i, j))
                 {
                     toTestVert.Add(card4);
                 }
@@ -116,19 +117,47 @@ public class EnemyTurnMaker : MonoBehaviour {
 
             foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE)))
             {
-                terminal = curGame.CheckGameOverClaim(toTestHoriz, t) ||
-                    curGame.CheckGameOverClaim(toTestVert, t);
-
-                if (terminal)
+                if (curGame.CheckGameOverClaim(toTestHoriz, t))
                 {
-                    return terminal;
+                    for (int j = 0; j < 5; j++)
+                    {
+                        var space1 = (from space in FindObjectsOfType<BoardSpaceStruct>() where (space.x == j && space.y == i) select space).FirstOrDefault();
+                        space1.setOutlineColor(2);
+                    }
+                    return;
+                }
+                else if (curGame.CheckGameOverClaim(toTestVert, t))
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        var space1 = (from space in FindObjectsOfType<BoardSpaceStruct>() where (space.x == i && space.y == j) select space).FirstOrDefault();
+                        space1.setOutlineColor(2);
+                    }
+                    return;
                 }
             }
         }
         foreach (HANDTYPE t in Enum.GetValues(typeof(HANDTYPE)))
         {
-            terminal = curGame.CheckGameOverClaim(toTestDiag1, t) || curGame.CheckGameOverClaim(toTestDiag2, t);
+            if (curGame.CheckGameOverClaim(toTestDiag1, t))
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        var space1 = (from space in FindObjectsOfType<BoardSpaceStruct>() where (space.x == j && space.y == j) select space).FirstOrDefault();
+                        space1.setOutlineColor(2);
+                    }
+                    return;
+                }
+                else if (curGame.CheckGameOverClaim(toTestDiag2, t))
+                {
+                    for (int j = 0; j < 5; j++)
+                    {
+                        var space1 = (from space in FindObjectsOfType<BoardSpaceStruct>() where (space.x == j && space.y == 4 - j) select space).FirstOrDefault();
+                        space1.setOutlineColor(2);
+                    }
+                    return;
+                }
         }
-        return terminal;
+        return;
     }
 }
