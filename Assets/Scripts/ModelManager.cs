@@ -148,7 +148,7 @@ public class ModelManager : MonoBehaviour
     private IEnumerator restartGame()
     {
         changeDisplayText();
-        yield return new WaitForSeconds(4f);
+        yield return new WaitForSeconds(6f);
 
         gameModel = gameModel.RestartGame();
 
