@@ -90,7 +90,7 @@ public class RLBrain
             moveCnt++;
             //Console.WriteLine(moveCnt);
             string winPercent = gameNode.visitCnt == 0 ? "0" : (gameNode.winCnt / gameNode.visitCnt).ToString();
-            Console.WriteLine(String.Format("Game: {2} -- Move: {0} -- Win Rate: {1}\n{3}", moveCnt, winPercent, i, gameNode.move.ToString()));
+            Console.WriteLine(String.Format("Game: {2} -- Move: {0} -- Win Rate: {1}\n{3}", moveCnt, winPercent.PadRight(4), i, gameNode.move.ToString()));
             WriteToFile("./SkyNetData/Game_" + i.ToString() + "_Stats.txt", String.Format("Move: {0} -- Num Iters: {1} -- {2}\n{3}", moveCnt, numPlaythroughs, i, gameNode.move.ToString()));
             if (moveCnt >= maxMoves)
             {

@@ -1,5 +1,0 @@
-Game: 9    -- STARTINGGame: 9    -- ITERATION 1/10
-Game: 9    -- ITERATION 2/10
-Game: 9    -- ITERATION 3/10
-Game: 9    -- ITERATION 4/10
-Game: 9    -- ITERATION 5/10
