@@ -96,6 +96,10 @@ public class GameMove
                 typeStr = "REMOVE";
                 typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}", x1.ToString(), y1.ToString());
                 break;
+            case MoveType.PEEK:
+                typeStr = "PEEK";
+                typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}", x1.ToString(), y1.ToString());
+                break;
         }
         return string.Format("[GameMove]\n{0}\n{1}", typeStr, typeSpecificStr);
     }

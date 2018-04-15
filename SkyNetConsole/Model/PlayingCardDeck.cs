@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 public enum Suit { Hearts = 0, Clubs, Diamonds, Spades}
 /// <summary>
 /// Represents a Standard deck of playing cards
 /// </summary>
+[System.Serializable]
 public class PlayingCardDeck : IDeck
 {
     public int decksize { get; set; }
@@ -104,5 +106,16 @@ public class PlayingCardDeck : IDeck
     public IDeck CopyDeck()
     {
         return new PlayingCardDeck(this);
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+        info.AddValue("cards", this.cards, typeof(List<ICard>));
+        info.AddValue("decksize", this.decksize, typeof(int));
+    }
+
+    public PlayingCardDeck(SerializationInfo info, StreamingContext context){
+        this.cards = (List<ICard>) info.GetValue("cards", typeof(List<ICard>));
+        this.decksize = (int) info.GetValue("decksize", typeof(int));
     }
 }
