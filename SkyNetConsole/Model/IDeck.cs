@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 /// <summary>
 /// Represents a Deck of Cards either playing cards or not
 /// </summary>
-public interface IDeck
+public interface IDeck : ISerializable
 {
     /// <summary>
     /// Initializes the deck

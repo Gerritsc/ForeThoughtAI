@@ -49,6 +49,29 @@ public class Game : IGame
 
     }
 
+    public Game(IDeck pDeck){
+        deck = pDeck.CopyDeck();
+        playerturn = 0;
+        removalmap = new Dictionary<int, bool>();
+        removalmap.Add(0, true);
+        removalmap.Add(1, true);
+
+        var startingcards = new ICard[5];
+        for (int i = 0; i < 5; i++)
+        {
+            startingcards[i] = deck.DrawCard();
+        }
+        board = new GameBoard(startingcards);
+
+        player1hand = new List<ICard>();
+        player2hand = new List<ICard>();
+        for (int i = 0; i < 5; i++)
+        {
+            player1hand.Add(deck.DrawCard());
+            player2hand.Add(deck.DrawCard());
+        }
+    }
+
     private Game(Game game)
     {
         this.deck = game.deck.CopyDeck();
