@@ -31,7 +31,7 @@ namespace SkyNetConsole
             }
             for (int i = startBundleNum; i < (startBundleNum + numRounds); i++)
             {
-                Directory.CreateDirectory(String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/", i.ToString(), 101, numIters.ToString()));
+                Directory.CreateDirectory(String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/", i.ToString(), RLBrain.endInd - RLBrain.startInd, numIters.ToString()));
                 RLBrain.SelfTeach(numGames, numIters, i);
             }
             BinaryFormatter bf1 = new BinaryFormatter();
