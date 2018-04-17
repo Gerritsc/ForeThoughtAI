@@ -12,12 +12,12 @@ namespace SkyNetConsole
 
     class Program
     {
-        static int numGames = 50;
-        private static int startBundleNum = 1;
+        static int numGames = 5;
+        private static int startBundleNum = 0;
 
-        private static int numRounds = 100;
+        private static int numRounds = 200;
 
-        private static int numIters = 100;
+        private static int numIters = 300;
         static void Main(string[] args)
         {
             RLBrain squishy = RLBrain.FindSquishy();
@@ -31,7 +31,7 @@ namespace SkyNetConsole
             }
             for (int i = startBundleNum; i < (startBundleNum + numRounds); i++)
             {
-                Directory.CreateDirectory(String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/", i.ToString(), 101, numIters.ToString()));
+                Directory.CreateDirectory(String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/", i.ToString(), RLBrain.endInd - RLBrain.startInd, numIters.ToString()));
                 RLBrain.SelfTeach(numGames, numIters, i);
             }
             BinaryFormatter bf1 = new BinaryFormatter();

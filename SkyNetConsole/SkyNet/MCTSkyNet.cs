@@ -12,12 +12,12 @@ public class SkyNetNode
     public bool playerOne;
     public float visitCnt;
     public float winCnt;
-    bool terminal;
+    public bool terminal;
     public string boardHash;
     public string hand;
     public List<SkyNetNode> children;
-    private List<ICard> winningHand;
-    private HANDTYPE winningType;
+    public List<ICard> winningHand;
+    public HANDTYPE winningType;
 
     public int level;
 
@@ -124,7 +124,7 @@ public class MCTSkyNet
         //hashAndSlasher = ZobristKiller.GetTheKiller();
         string localBString = game.getBoardAsString(game.getBoard(), !game.isPlayerOneTurn());
         rootNode = new SkyNetNode(localBString, !game.isPlayerOneTurn(), game.getHandAsString(!game.isPlayerOneTurn()));
-        RLBrain.RequestExistingRoot(rootNode, gameNum, bundleNum, numGames, numIters);
+        RLBrain.RequestExistingRoot(ref rootNode, gameNum, bundleNum, numGames, numIters);
     }
 
     public void SetRoot(SkyNetNode newRoot)

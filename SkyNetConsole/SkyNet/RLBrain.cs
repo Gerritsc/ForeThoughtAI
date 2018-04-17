@@ -31,12 +31,12 @@ public class RLBrain
 
     //private IGame constGame = new Game();
 
-    public static readonly int maxMoves = 500;
+    public static readonly int maxMoves = 1000;
 
     private static List<int> usedDeckInd = new List<int>();
 
-    private static int startInd = 0;
-    private static int endInd = 32;
+    public static int startInd = 29;
+    public static int endInd = 34;
 
     private RLBrain()
     {
@@ -187,7 +187,8 @@ public class RLBrain
             //Console.WriteLine(moveCnt);
             float winRate = picked.visitCnt == 0 ? 0 : (picked.winCnt / picked.visitCnt);
             string winPercent = winRate.ToString();
-            //Log(i, String.Format("Game: {2} -- Move: {0} -- Win Rate: {1}\n{3}", moveCnt, winPercent, i.ToString().PadRight(4), picked.move.ToString()), bundleNum, numGames, numPlaythroughs);
+            //Log(i, String.Format("Move: {0}", moveCnt), bundleNum, numGames, numPlaythroughs);
+            Log(i, String.Format("Move: {0} -- Win Rate: {1}", moveCnt, winPercent), bundleNum, numGames, numPlaythroughs);
             if (moveCnt >= maxMoves)
             {
                 curBoardTerminal = true;
@@ -365,14 +366,13 @@ public class RLBrain
         return false;
     }
 
-    public static bool RequestExistingRoot(SkyNetNode root, int gameNum, int bundleNum, int numGames, int numIters)
+    public static bool RequestExistingRoot(ref SkyNetNode root, int gameNum, int bundleNum, int numGames, int numIters)
     {
         string hashKey = root.boardHash + root.hand;
         rootMut.WaitOne();
         if (!RootMap.ContainsKey(hashKey))
         {
-            int cnt = RootMap.Count;
-            RootMap.Add(hashKey, cnt);
+            RootMap.Add(hashKey, gameNum);
 
         }
         int key = RootMap[hashKey];
@@ -383,6 +383,7 @@ public class RLBrain
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open("./SkyNetData/Root_" + key.ToString() + ".dat", FileMode.Open);
             root = (SkyNetNode)bf.Deserialize(file);
+            Debug.Assert(hashKey.Equals(root.boardHash + root.hand));
             file.Close();
             fileMut.ReleaseMutex();
             rootMut.ReleaseMutex();
