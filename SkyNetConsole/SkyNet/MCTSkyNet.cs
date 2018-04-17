@@ -249,9 +249,9 @@ public class MCTSkyNet
         foreach (SkyNetNode skyNode in curNode.children)
         {
             float childWinRate = (skyNode.visitCnt == 0 ? 0 : skyNode.winCnt / skyNode.visitCnt)
-                + ((.8f / (skyNode.winCnt + 1)) 
-                * (float) Math.Sqrt(Math.Log(moveCnt / (skyNode.visitCnt == 0 ? 1 : skyNode.visitCnt)) 
-                / (skyNode.visitCnt == 0 ? 1 : skyNode.visitCnt)));;
+                + ( (.8f / (skyNode.winCnt + 1)) 
+                * ((float) Math.Sqrt(Math.Log(moveCnt / (skyNode.visitCnt == 0 ? 1 : skyNode.visitCnt)) 
+                    / (skyNode.visitCnt == 0 ? 1 : skyNode.visitCnt))) );;
             if (childWinRate > topWinRate)
             {
                 toRet = skyNode;
