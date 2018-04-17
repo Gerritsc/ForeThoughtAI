@@ -15,19 +15,19 @@ public class RLBrain
 
     private static Dictionary<string, int> RootMap = new Dictionary<string, int>();
 
-    private static List<IDeck> constDecks = new List<IDeck>();
+    public static List<IDeck> constDecks = new List<IDeck>();
 
-    [System.NonSerialized]
-    private static Mutex fileMut = new Mutex();
+ //   [System.NonSerialized]
+    //private static Mutex fileMut = new Mutex();
 
-    [System.NonSerialized]
-    private static Mutex rootMut = new Mutex();
+ //   [System.NonSerialized]
+    //private static Mutex rootMut = new Mutex();
     [System.NonSerialized]
     private static RLBrain squishy = new RLBrain();
     [System.NonSerialized]
     private int numPlayouts = 2;
-    [System.NonSerialized]
-    private static Mutex deckMut = new Mutex();
+  //  [System.NonSerialized]
+    //private static Mutex deckMut = new Mutex();
 
     //private IGame constGame = new Game();
 
@@ -182,15 +182,15 @@ public class RLBrain
 
     public static void Save(SkyNetNode toSave, int bundleNum, int numGames, int numIters)
     {
-        fileMut.WaitOne();
-        rootMut.WaitOne();
+        //fileMut.WaitOne();
+        //rootMut.WaitOne();
         if (RootMap.ContainsKey(toSave.boardHash + toSave.hand))
         {
             int key = RootMap[toSave.boardHash + toSave.hand];
             BinaryFormatter bf1 = new BinaryFormatter();
             BinaryFormatter bf2 = new BinaryFormatter();
-            FileStream file1 = File.Create("./SkyNetData/Root_" + key.ToString() + ".dat");
-            FileStream file2 = File.Create(String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/Root_{3}.dat", bundleNum.ToString(), numGames.ToString(), numIters.ToString(), key.ToString()));
+			FileStream file1 = File.Create("./SkyNetConsole/SkyNetData/Root_" + key.ToString() + ".dat");
+			FileStream file2 = File.Create(String.Format("./SkyNetConsole/SkyNetData/Root_Bundle_{0}_{1}G_{2}I/Root_{3}.dat", bundleNum.ToString(), numGames.ToString(), numIters.ToString(), key.ToString()));
 
             bf1.Serialize(file1, toSave);
             bf2.Serialize(file2, toSave);
@@ -199,83 +199,83 @@ public class RLBrain
         }
         Console.WriteLine("SAVED SQUISHY!!!");
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create("./SkyNetData/RootMap.dat");
-        FileStream file0 = File.Create(String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/RootMap.dat", bundleNum.ToString(), numGames.ToString(), numIters.ToString()));
+		FileStream file = File.Create("./SkyNetConsole/SkyNetData/RootMap.dat");
+		FileStream file0 = File.Create(String.Format("./SkyNetConsole/SkyNetData/Root_Bundle_{0}_{1}G_{2}I/RootMap.dat", bundleNum.ToString(), numGames.ToString(), numIters.ToString()));
         bf.Serialize(file, RootMap);
         bf.Serialize(file0, RootMap);
-        rootMut.ReleaseMutex();
+        //rootMut.ReleaseMutex();
         file.Close();
         file0.Close();
-        fileMut.ReleaseMutex();
+        //fileMut.ReleaseMutex();
     }
     public static bool Load()
     {
-        fileMut.WaitOne();
-        if (!File.Exists("./SkyNetData/ConstDecks.dat"))
+        //fileMut.WaitOne();
+		if (!File.Exists("./SkyNetConsole/SkyNetData/ConstDecks.dat"))
         {
             InitDecks();
         }
         else
         {
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open("./SkyNetData/ConstDecks.dat", FileMode.Open);
+            FileStream file = File.Open("./SkyNetConsole/SkyNetData/ConstDecks.dat", FileMode.Open);
             constDecks = (List<IDeck>)bf.Deserialize(file);
             file.Close();
         }
-        if (File.Exists("./SkyNetData/RootMap.dat"))
+		if (File.Exists("./SkyNetConsole/SkyNetData/RootMap.dat"))
         {
             Console.WriteLine("FOUND SQUISHY!!!");
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open("./SkyNetData/RootMap.dat", FileMode.Open);
-            rootMut.WaitOne();
+			FileStream file = File.Open("./SkyNetConsole/SkyNetData/RootMap.dat", FileMode.Open);
+            //rootMut.WaitOne();
             RootMap = (Dictionary<string, int>)bf.Deserialize(file);
-            rootMut.ReleaseMutex();
+            //rootMut.ReleaseMutex();
             file.Close();
-            fileMut.ReleaseMutex();
+            //fileMut.ReleaseMutex();
             return true;
         }
-        fileMut.ReleaseMutex();
+        //fileMut.ReleaseMutex();
         return false;
     }
 
     public static bool RequestExistingRoot(ref SkyNetNode root, int gameNum, int bundleNum, int numGames, int numIters)
     {
         string hashKey = root.boardHash + root.hand;
-        rootMut.WaitOne();
+        //rootMut.WaitOne();
         if (!RootMap.ContainsKey(hashKey))
         {
             RootMap.Add(hashKey, gameNum);
 
         }
         int key = RootMap[hashKey];
-        if (File.Exists("./SkyNetData/Root_" + key.ToString() + ".dat"))
+		if (File.Exists("./SkyNetConsole/SkyNetData/Root_" + key.ToString() + ".dat"))
         {
-            fileMut.WaitOne();
+            //fileMut.WaitOne();
             Log(gameNum, "LOADED ROOT", bundleNum, numGames, numIters);
             BinaryFormatter bf = new BinaryFormatter();
-            FileStream file = File.Open("./SkyNetData/Root_" + key.ToString() + ".dat", FileMode.Open);
+			FileStream file = File.Open("./SkyNetConsole/SkyNetData/Root_" + key.ToString() + ".dat", FileMode.Open);
             root = (SkyNetNode)bf.Deserialize(file);
             Debug.Assert(hashKey.Equals(root.boardHash + root.hand));
             file.Close();
-            fileMut.ReleaseMutex();
-            rootMut.ReleaseMutex();
+            //fileMut.ReleaseMutex();
+            //rootMut.ReleaseMutex();
             return true;
         }
         //Save(root, bundleNum, numGames, numIters);
-        rootMut.ReleaseMutex();
+        //rootMut.ReleaseMutex();
         return false;
     }
 
     public static void PrintTree(int treeNum)
     {
-        rootMut.WaitOne();
+        //rootMut.WaitOne();
         foreach (SkyNetNode n in skyNetTreeRoots)
         {
-            string filestr = "./SkyNetData/Tree" + treeNum.ToString() + ".txt";
+			string filestr = "./SkyNetConsole/SkyNetData/Tree" + treeNum.ToString() + ".txt";
             WriteToFile(filestr, n.ToString());
             PrintTreeHelper(n, 0, filestr);
         }
-        rootMut.ReleaseMutex();
+        //rootMut.ReleaseMutex();
     }
 
     private static void PrintTreeHelper(SkyNetNode curNode, int lev, string filestr)
@@ -319,7 +319,7 @@ public class RLBrain
 
     private static void InitDecks()
     {
-        fileMut.WaitOne();
+        //fileMut.WaitOne();
         for (int i = 0; i < 101; i++)
         {
             IDeck toAdd = new PlayingCardDeck();
@@ -327,9 +327,9 @@ public class RLBrain
             constDecks.Add(toAdd);
         }
         BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Create("./SkyNetData/ConstDecks.dat");
+		FileStream file = File.Create("./SkyNetConsole/SkyNetData/ConstDecks.dat");
         bf.Serialize(file, constDecks);
         file.Close();
-        fileMut.ReleaseMutex();
+        //fileMut.ReleaseMutex();
     }
 }

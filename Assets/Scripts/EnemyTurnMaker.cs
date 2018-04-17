@@ -30,8 +30,7 @@ public class EnemyTurnMaker : MonoBehaviour
     {
         var playsToMake = model.gameModel.getAllPlayerMoves(model.gameModel.getBoard(), false);
 
-		//GameMove squish = model.skySquishy.PickGameMove(model.gameModel, 
-       // var playToMake = playsToMake[rand];
+		GameMove playToMake = model.skySquishy.PickGameMove (model.gameModel, LastPlayerMove);
 
         switch (playToMake.type)
         {

@@ -28,7 +28,7 @@ public class ModelManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-		gameModel = new Game(RLBrain.startInd);
+		gameModel = new Game();
 		skySquishy = new MCTSkyNet (gameModel, RLBrain.startInd);
         FindObjectOfType<HandRender>().InitHand();
         FindObjectOfType<BoardRenderer>().initBoard();

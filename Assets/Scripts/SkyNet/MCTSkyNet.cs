@@ -125,13 +125,13 @@ public class MCTSkyNet
         //hashAndSlasher = ZobristKiller.GetTheKiller();
         string localBString = game.getBoardAsString(game.getBoard(), !game.isPlayerOneTurn());
         rootNode = new SkyNetNode(localBString, !game.isPlayerOneTurn(), game.getHandAsString(!game.isPlayerOneTurn()));
-        RLBrain.RequestExistingRoot(ref rootNode, gameNum, bundleNum, numGames, numIters);
+        //RLBrain.RequestExistingRoot(ref rootNode, gameNum, bundleNum, numGames, numIters);
     }
 
     public MCTSkyNet(IGame game, int gameNum){
         string localBString = game.getBoardAsString(game.getBoard(), !game.isPlayerOneTurn());
         rootNode = new SkyNetNode(localBString, !game.isPlayerOneTurn(), game.getHandAsString(!game.isPlayerOneTurn()));
-        RLBrain.RequestExistingRoot(ref rootNode, gameNum, 0, 1, 0);
+        //RLBrain.RequestExistingRoot(ref rootNode, gameNum, 0, 1, 0);
         curGameHead = rootNode;
     }
 
