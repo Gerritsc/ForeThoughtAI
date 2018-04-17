@@ -31,12 +31,12 @@ public class RLBrain
 
     //private IGame constGame = new Game();
 
-    public static readonly int maxMoves = 500;
+    public static readonly int maxMoves = 1000;
 
     private static List<int> usedDeckInd = new List<int>();
 
-    public static int startInd = 0;
-    public static int endInd = 33;
+    public static int startInd = 29;
+    public static int endInd = 34;
 
     private RLBrain()
     {
@@ -366,7 +366,7 @@ public class RLBrain
         return false;
     }
 
-    public static bool RequestExistingRoot(SkyNetNode root, int gameNum, int bundleNum, int numGames, int numIters)
+    public static bool RequestExistingRoot(ref SkyNetNode root, int gameNum, int bundleNum, int numGames, int numIters)
     {
         string hashKey = root.boardHash + root.hand;
         rootMut.WaitOne();
