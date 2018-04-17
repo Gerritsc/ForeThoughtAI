@@ -19,6 +19,8 @@ public class PlayerTurnManager : MonoBehaviour
 
     bool swapflag;
 
+    public GameMove movemade;
+
     private void OnDisable()
     {
         FindObjectOfType<buttonManager>().Deselect();
@@ -31,6 +33,7 @@ public class PlayerTurnManager : MonoBehaviour
         manager = FindObjectOfType<ModelManager>();
         SelectedSpace = null;
         SelectedCard = null;
+        movemade = null;
         swapflag = false;
     }
 	
@@ -70,6 +73,7 @@ public class PlayerTurnManager : MonoBehaviour
                     {
                         manager.gameModel.PlayCard(0, space.x, space.y, SelectedCard.card);
                         SelectedCard.setOutlineColor(0);
+                        movemade = new GameMove(space.x, space.y, SelectedCard.card);
                         SelectedCard = null;
                         manager.updateBoard();
                         manager.switchState();
@@ -96,6 +100,7 @@ public class PlayerTurnManager : MonoBehaviour
     {
         StartCoroutine("peekFunctionality", 2f);
         manager.gameModel.addPeekToKnown(SelectedSpace.x, SelectedSpace.y);
+        movemade = new GameMove(SelectedSpace.x, SelectedSpace.y, true);
         manager.switchState();
     }
 
@@ -106,6 +111,7 @@ public class PlayerTurnManager : MonoBehaviour
         SelectedSpace.setOutlineColor(0);
         manager.updateBoard();
         FindObjectOfType<buttonManager> ().Deselect ();
+        movemade = new GameMove(spaceToRemove.x, spaceToRemove.y, false);
         manager.switchState();
     }
 
@@ -213,6 +219,7 @@ public class PlayerTurnManager : MonoBehaviour
                 manager.gameModel.SwapCards(0, SelectedSpace.x, SelectedSpace.y, space.x, space.y);
                 manager.updateBoard();
                 SelectedSpace.setOutlineColor(0);
+                movemade = new GameMove(SelectedSpace.x, SelectedSpace.y, space.x, space.y);
                 SelectedSpace = null;
                 FindObjectOfType<buttonManager>().Deselect();
                 swapflag = false;
