@@ -36,7 +36,7 @@ public class RLBrain
     private static List<int> usedDeckInd = new List<int>();
 
     public static int startInd = 29;
-    public static int endInd = 34;
+    public static int endInd = 30;
 
     private RLBrain()
     {
@@ -123,9 +123,9 @@ public class RLBrain
 
     public static void SelfTeach(int numGames, int numPlaythroughs, int bundleNum)
     {
-        usedDeckInd = new List<int>();
-        for (int i = startInd; i < endInd; i++)
-        {
+        //usedDeckInd = new List<int>();
+        //for (int i = startInd; i < endInd; i++)
+        //{
             // deckMut.WaitOne();
             // Random rand = new Random();
             // int deckInd = rand.Next(0, constDecks.Count);
@@ -135,23 +135,23 @@ public class RLBrain
             // }
             // usedDeckInd.Add(i);
             // deckMut.ReleaseMutex();
-            object[] objArr = new object[] { endInd - startInd, i, numPlaythroughs, bundleNum };
-            ThreadPool.QueueUserWorkItem(squishy.Test, objArr);
-            //squishy.Test(objArr);
-        }
+            object[] objArr = new object[] {numGames, startInd, numPlaythroughs, bundleNum };
+            //ThreadPool.QueueUserWorkItem(squishy.Test, objArr);
+            squishy.Test(objArr);
+        //}
 
-        int numAvail = 0;
-        int other1 = 0;
-        int maxThreads = 0;
-        int other2 = 0;
-        int numRunning = 0;
+        // int numAvail = 0;
+        // int other1 = 0;
+        // int maxThreads = 0;
+        // int other2 = 0;
+        // int numRunning = 0;
 
-        do
-        {
-            ThreadPool.GetAvailableThreads(out numAvail, out other1);
-            ThreadPool.GetMaxThreads(out maxThreads, out other2);
-            numRunning = (maxThreads - numAvail) + (other2 - other1);
-        } while (numRunning > 0);
+        // do
+        // {
+        //     ThreadPool.GetAvailableThreads(out numAvail, out other1);
+        //     ThreadPool.GetMaxThreads(out maxThreads, out other2);
+        //     numRunning = (maxThreads - numAvail) + (other2 - other1);
+        // } while (numRunning > 0);
     }
 
     public void Test(object obj)
@@ -173,26 +173,26 @@ public class RLBrain
         {
             SkyNetNode picked = squishyThought.PickOfficialMove(game, gameNode, numPlaythroughs, i);
 
-            if (picked.isTerminal())
-            {
-                curBoardTerminal = true;
-                int winningPlayer = picked.playerOne ? 1 : 2;
-                Log(i, String.Format("ENDING -- PLAYER {0} WIN", winningPlayer), bundleNum, numGames, numPlaythroughs);
-                continue;
-            }
-            Debug.Assert(picked.playerOne == game.isPlayerOneTurn());
+        
+            //Debug.Assert(picked.playerOne == game.isPlayerOneTurn());
             MakeMove(game, picked.move);
             //Console.Write(gameNode.ToString());
             moveCnt++;
             //Console.WriteLine(moveCnt);
-            float winRate = picked.visitCnt == 0 ? 0 : (picked.winCnt / picked.visitCnt);
-            string winPercent = winRate.ToString();
+            //float winRate = picked.visitCnt == 0 ? 0 : (picked.winCnt / picked.visitCnt);
+            //string winPercent = winRate.ToString();
             //Log(i, String.Format("Move: {0}", moveCnt), bundleNum, numGames, numPlaythroughs);
-            Log(i, String.Format("Move: {0} -- Win Rate: {1}", moveCnt, winPercent), bundleNum, numGames, numPlaythroughs);
-            if (moveCnt >= maxMoves)
+            //Log(i, String.Format("Move: {0} -- Win Rate: {1}", moveCnt, winPercent), bundleNum, numGames, numPlaythroughs);
+            if (picked.isTerminal())
             {
                 curBoardTerminal = true;
-                Log(i, "GAME ENDING -- STALEMATE", bundleNum, numGames, numPlaythroughs);
+                int winningPlayer = picked.playerOne ? 1 : 2;
+                Log(i, String.Format("ENDING -- PLAYER {0} WIN -- MOVES {1}", winningPlayer, moveCnt), bundleNum, numGames, numPlaythroughs);
+                continue;
+            } else if (moveCnt >= maxMoves)
+            {
+                curBoardTerminal = true;
+                Log(i, "GAME ENDING -- STALEMATE -- MOVES " + moveCnt.ToString(), bundleNum, numGames, numPlaythroughs);
                 continue;
             }
             //updateRootList(squishyThought.GetRoot());
@@ -439,10 +439,10 @@ public class RLBrain
     public static void Log(int gameNum, string msg, int bundleNum, int numGames, int numIters)
     {
         string toPrint = String.Format("Game: {0} -- {1}", gameNum.ToString().PadRight(4), msg);
-        Console.WriteLine(toPrint);
-        //WriteToFile("./SkyNetData/Game_" + gameNum.ToString() + "_Stats.txt", toPrint + "\n");
-        //string file = String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/Game_{3}_Stats.txt", bundleNum.ToString(), numGames.ToString(), numIters.ToString(), gameNum.ToString());
-        //WriteToFile(file, toPrint + "\n");
+        //Console.WriteLine(toPrint);
+        WriteToFile("./SkyNetData/Game_" + gameNum.ToString() + "_Stats.txt", toPrint + "\n");
+        string file = String.Format("./SkyNetData/Root_Bundle_{0}_{1}G_{2}I/Game_{3}_Stats.txt", bundleNum.ToString(), numGames.ToString(), numIters.ToString(), gameNum.ToString());
+        WriteToFile(file, toPrint + "\n");
     }
 
     private static void InitDecks()
