@@ -113,7 +113,7 @@ public class MCTSkyNet
     SkyNetNode rootNode;
     //ZobristKiller hashAndSlasher;
 
-    float maxWait = 5.0f;
+    float maxWait = 10.0f;
 
     static Mutex rootMut = new Mutex();
     private bool printStates = false;
@@ -148,7 +148,7 @@ public class MCTSkyNet
         }
     }
 
-    public GameMove PickGameMove(IGame game, GameMove prevPlayerMove){
+    public GameMove PickGameMove(ref IGame game, GameMove prevPlayerMove){
 
         if(prevPlayerMove != null){
             foreach(SkyNetNode pMove in rootNode.children){
@@ -165,11 +165,11 @@ public class MCTSkyNet
         DateTime endTime = DateTime.UtcNow.AddSeconds(maxWait);
         int curITer = 0;
         while( DateTime.Compare(curTime, endTime) < 0){
-            MCTSSingleIteration(game.CopyGame(), curGameHead, curITer, curGameHead.level);
+            MCTSSingleIteration(game.CopyGame(), ref curGameHead, curITer, curGameHead.level);
             curITer++;
             curTime = DateTime.UtcNow;
         }
-        SkyNetNode toRet = MCTSSelect(curGameHead, -1, -1);
+        SkyNetNode toRet = MCTSSelect(curGameHead, 1, 1);
         return toRet.move;
     }
 
@@ -183,7 +183,7 @@ public class MCTSkyNet
             //RLBrain.Log(gameNum, String.Format("ITERATION {0}/{1}", i + 1, numIters));
             object[] objArr = new object[] { game.CopyGame(), gameNode, i };
             ///ThreadPool.QueueUserWorkItem(MCTSSingleIterationThreaded, objArr);
-            MCTSSingleIteration(game.CopyGame(), gameNode, i, moveCnt);
+            MCTSSingleIteration(game.CopyGame(), ref gameNode, i, moveCnt);
             //curTime = DateTime.UtcNow;
         }
 
@@ -201,7 +201,7 @@ public class MCTSkyNet
         //     //Console.WriteLine(String.Format("{0} RUNNING -- {1} AVAILABLE", numRunning, numAvail));
         // } while (numRunning > 0);
 
-        SkyNetNode chosen = MCTSSelect(gameNode, -1, moveCnt);
+        SkyNetNode chosen = MCTSSelect(gameNode, 1, moveCnt);
         return chosen;
     }
 
@@ -212,7 +212,7 @@ public class MCTSkyNet
         SkyNetNode gameNode = (SkyNetNode)objArr[1];
         int iterNum = (int)objArr[2];
         //Console.WriteLine(String.Format("ENTERING ITERATION -- {0}", iterNum));
-        MCTSExpand(curGame, gameNode, iterNum);
+        MCTSExpand(curGame, ref gameNode, iterNum);
         SkyNetNode pickedChild = MCTSSelect(gameNode, iterNum, moveCnt);
         bool stalemate = false;
         bool playerOneWin = MCTSRandSimPlayout(curGame, pickedChild, ref stalemate, iterNum);
@@ -221,11 +221,11 @@ public class MCTSkyNet
         //Console.WriteLine(String.Format("EXITING ITERATION -- {0}", iterNum));
     }
 
-    public void MCTSSingleIteration(IGame curGame, SkyNetNode gameNode, int iterNum, int moveCnt)
+    public void MCTSSingleIteration(IGame curGame, ref SkyNetNode gameNode, int iterNum, int moveCnt)
     {
 
         //Console.WriteLine(String.Format("ENTERING ITERATION -- {0}", iterNum));
-        MCTSExpand(curGame, gameNode, iterNum);
+        MCTSExpand(curGame, ref gameNode, iterNum);
         SkyNetNode pickedChild = MCTSSelect(gameNode, iterNum, moveCnt);
         bool stalemate = false;
         bool playerOneWin = MCTSRandSimPlayout(curGame, pickedChild, ref stalemate, iterNum);
@@ -239,7 +239,7 @@ public class MCTSkyNet
         return rootNode;
     }
 
-    private void MCTSExpand(IGame curGame, SkyNetNode gameNode, int iterNum)
+    private void MCTSExpand(IGame curGame, ref SkyNetNode gameNode, int iterNum)
     {
         if (printStates)
         {
@@ -251,7 +251,7 @@ public class MCTSkyNet
         List<GameMove> availMoves = curGame.getAllPlayerMoves(localBoard, curGame.isPlayerOneTurn());
         int cnt = availMoves.Count;
         CheckTerminalNode(curGame, localBoard, gameNode);
-        rootMut.WaitOne();
+        //rootMut.WaitOne();
         if (cnt > 0 && !gameNode.isTerminal())
         {
             if (gameNode.children == null) { gameNode.children = new List<SkyNetNode>(); }
@@ -269,7 +269,7 @@ public class MCTSkyNet
                 }
             }
         }
-        rootMut.ReleaseMutex();
+        //rootMut.ReleaseMutex();
         DebugPrint("EXITING MCTS EXPANSION -- " + iterNum.ToString() + "\n");
     }
 
@@ -278,14 +278,14 @@ public class MCTSkyNet
         DebugPrint("ENTERING MCTS SELECTION -- " + iterNum.ToString() + "\n");
         SkyNetNode toRet = curNode;
         float topWinRate = float.MinValue;
-        rootMut.WaitOne();
+        //rootMut.WaitOne();
         foreach (SkyNetNode skyNode in curNode.children)
         {
             //Console.WriteLine(iterNum);
             float childWinRate = (skyNode.winCnt / skyNode.visitCnt);
-            if(iterNum != -1 && moveCnt != -1){
+            //if(iterNum != -1 && moveCnt != -1){
                 childWinRate = childWinRate  + ( (.8f / (skyNode.winCnt + 1))  * ((float) Math.Sqrt(Math.Log(((iterNum + 1) / (skyNode.visitCnt)) < 1 ? 1 : ((iterNum + 1) / (skyNode.visitCnt))) / (skyNode.visitCnt))));
-            }
+            //}
         //     float childWinRate = ((skyNode.winCnt / skyNode.visitCnt)
         //            + ( (.8f / (skyNode.winCnt + 1)) 
         //            * ((float) Math.Sqrt(Math.Log(((iterNum + 1) / (skyNode.visitCnt)) < 1 ? 1 : ((iterNum + 1) / (skyNode.visitCnt))) / (skyNode.visitCnt)))));
@@ -297,7 +297,7 @@ public class MCTSkyNet
                 DebugPrint("Found More Valuable Child\n");
             }
         }
-        rootMut.ReleaseMutex();
+        //rootMut.ReleaseMutex();
         if(!curNode.terminal){
             Debug.Assert(!toRet.Equals(curNode));
         }
