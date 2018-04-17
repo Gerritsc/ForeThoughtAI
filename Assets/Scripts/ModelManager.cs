@@ -64,6 +64,7 @@ public class ModelManager : MonoBehaviour
                     FindObjectOfType<ClaimManager>().enabled = false;
                     FindObjectOfType<ClaimGameRenderer>().disableClaims();
                     gameModel.switchTurn();
+                    FindObjectOfType<EnemyTurnMaker>().setPlayerMove(FindObjectOfType<PlayerTurnManager>().movemade);
                     FindObjectOfType<EnemyTurnMaker>().takeTurn();
                     break;
                 }

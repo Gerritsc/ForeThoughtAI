@@ -14,12 +14,16 @@ public class EnemyTurnMaker : MonoBehaviour
     [SerializeField]
     Text DisplayText;
 
+
+    GameMove LastPlayerMove;
+
     // Use this for initialization
     void Start()
     {
         model = FindObjectOfType<ModelManager>();
         DisplayText.enabled = false;
         DisplayText.text = "The opponent has swapped 2 cards";
+        LastPlayerMove = null;
     }
 
     public void takeTurn()
@@ -60,6 +64,11 @@ public class EnemyTurnMaker : MonoBehaviour
         this.CheckTerminalBoard(model.gameModel, model.gameModel.getBoard());
         model.switchState();
 
+    }
+    
+    public void setPlayerMove(GameMove g) 
+    {
+        LastPlayerMove = g;
     }
 
     private IEnumerator DisplayPeek(GameMove g, float time)
