@@ -18,6 +18,8 @@ public class ModelManager : MonoBehaviour
     public delegate void BoardChangeAction(IGame gameModel);
     public event BoardChangeAction OnBoardChange;
 
+	public MCTSkyNet skySquishy;
+
     public enum GameState
     {
         PlayerPlay, PlayerClaim, EnemyTurn, WinState, LoseState
@@ -26,7 +28,8 @@ public class ModelManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        gameModel = new Game();
+		gameModel = new Game();
+		skySquishy = new MCTSkyNet (gameModel, RLBrain.startInd);
         FindObjectOfType<HandRender>().InitHand();
         FindObjectOfType<BoardRenderer>().initBoard();
         FindObjectOfType<ClaimGameRenderer>().initClaims();
@@ -76,7 +79,14 @@ public class ModelManager : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.Space) && currentstate == GameState.PlayerClaim)
         {
-            switchState();
+            gameModel = gameModel.CopyGame();
+            OnBoardChange(gameModel);
+        }
+        else if (Input.GetKeyUp(KeyCode.G))
+        {
+            var strings = gameModel.getBoardAsString(gameModel.getBoard(), gameModel.isPlayerOneTurn());           
+			Debug.Log(strings);
+            
         }
     }
 
