@@ -30,9 +30,8 @@ public class EnemyTurnMaker : MonoBehaviour
     {
         var playsToMake = model.gameModel.getAllPlayerMoves(model.gameModel.getBoard(), false);
 
-        int rand = UnityEngine.Random.Range(0, playsToMake.Count - 1);
-
-        var playToMake = playsToMake[rand];
+		//GameMove squish = model.skySquishy.PickGameMove(model.gameModel, 
+       // var playToMake = playsToMake[rand];
 
         switch (playToMake.type)
         {

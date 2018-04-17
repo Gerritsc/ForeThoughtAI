@@ -86,14 +86,18 @@ public class GameMove
         {
             case MoveType.ADD:
                 typeStr = "ADD";
-                typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}\n{2}", x1.ToString(), y1.ToString(), card.ToString());
+                typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}\n{2}", x1.ToString(), y1.ToString(), card.getFullCard());
                 break;
             case MoveType.SWAP:
                 typeStr = "SWAP";
-                typeSpecificStr = String.Format("Orig X-Pos: {0}\nOrig Y-Pos: {1}\nNext X-Pos: {2}\n Next Y-Pos: {3}", x1.ToString(), y1.ToString(), x2.ToString(), y2.ToString());
+                typeSpecificStr = String.Format("Orig X-Pos: {0}\nOrig Y-Pos: {1}\nNext X-Pos: {2}\nNext Y-Pos: {3}", x1.ToString(), y1.ToString(), x2.ToString(), y2.ToString());
                 break;
             case MoveType.REMOVE:
                 typeStr = "REMOVE";
+                typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}", x1.ToString(), y1.ToString());
+                break;
+            case MoveType.PEEK:
+                typeStr = "PEEK";
                 typeSpecificStr = String.Format("X-Pos: {0}\nY-Pos: {1}", x1.ToString(), y1.ToString());
                 break;
         }
