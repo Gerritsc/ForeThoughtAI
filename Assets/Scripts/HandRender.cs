@@ -35,7 +35,7 @@ public class HandRender : MonoBehaviour
 
     public void InitHand ()
     {
-        hand = FindObjectOfType<ModelManager> ().gameModel.getHand ();
+        hand = FindObjectOfType<ModelManager> ().gameModel.getHand (true);
         cards = new GameObject[5];
         var cardtosprite = FindObjectOfType<CardToSprite>();
         for (int i = 0; i < 5; i++)
@@ -66,11 +66,11 @@ public class HandRender : MonoBehaviour
 
     void UpdateHand(IGame model) 
     {
-        hand = model.getHand ();
+        hand = model.getHand (true);
         renderHand ();
         for (int i = 0; i < 5; i++)
         {
-            cards[i].GetComponent<HandCardStruct>().card = model.getHand()[i];
+            cards[i].GetComponent<HandCardStruct>().card = model.getHand(true)[i];
         }
  	}
 
