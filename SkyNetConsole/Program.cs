@@ -12,12 +12,12 @@ namespace SkyNetConsole
 
     class Program
     {
-        static int numGames = 5;
+        static int numGames = 1;
         private static int startBundleNum = 0;
 
         private static int numRounds = 200;
 
-        private static int numIters = 300;
+        private static int numIters = 500;
         static void Main(string[] args)
         {
             RLBrain squishy = RLBrain.FindSquishy();
