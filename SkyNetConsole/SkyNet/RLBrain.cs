@@ -171,7 +171,7 @@ public class RLBrain
         SkyNetNode gameNode = squishyThought.GetRoot();
         while (!curBoardTerminal)
         {
-            SkyNetNode picked = squishyThought.PickOfficialMove(game, gameNode, numPlaythroughs, i);
+            SkyNetNode picked = squishyThought.PickOfficialMove(game, gameNode, numPlaythroughs, i, moveCnt);
 
         
             //Debug.Assert(picked.playerOne == game.isPlayerOneTurn());
